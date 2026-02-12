@@ -12,7 +12,10 @@ loginRouter.post("/", async (req: Request, res: Response) => {
     const success: boolean = await service.checkUserCredentials(username, password);
 
     if(success) {
-        res.status(StatusCodes.OK).json({ message: "Login successful!" });
+        // create token
+        const token: string = service.createToken(username);
+        
+        res.status(StatusCodes.OK).json({ token: token, message: "Login successful!!" });
     } else {
         res.status(StatusCodes.UNAUTHORIZED).json({ message: "Invalid username or password!" });
     }

@@ -3,6 +3,7 @@ const { BIND_OUT, NUMBER } = oracledb;
 import { getDBConnection } from "../data.js";
 import type { User, UserRow } from "../model.js";
 import * as bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export class UserService {
 
@@ -97,6 +98,17 @@ export class UserService {
 
             return false;
         }
+    }
+
+    /**
+     * creates a JWT token for the provided username
+     * @param username username to create the token for
+     * @returns jwt token as a string
+     */
+    createToken(username: string): string {
+        // create token with JWT
+        const SECRET_KEY = "mySecretKey";
+        return jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
     }
 
 }

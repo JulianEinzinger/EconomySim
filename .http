@@ -1,11 +1,25 @@
-GET http://localhost:3000/users
+@host=http://localhost
+@port=3000
+@baseUrl={{host}}:{{port}}
+
+GET {{baseUrl}}/users
 
 ###
 
-POST http://localhost:3000/users
+POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
     "username": "JojoGamer88",
+    "password": "Passwort123!"
+}
+
+###
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "username": "GAMING1707",
     "password": "Passwort123!"
 }

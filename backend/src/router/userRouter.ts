@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { UserService } from "../services/userService.js";
 import type { User } from "../model.js";
 import { StatusCodes } from "http-status-codes";
+import { authenticateToken } from "../services/authService.js";
 
 export const userRouter = Router();
 
@@ -28,4 +29,9 @@ userRouter.post("/", async (req: Request, res: Response) => {
 
 userRouter.get("/companies", async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({companies: []});
+});
+
+// get user by token
+userRouter.get("/me", authenticateToken, (req: Request, res: Response) => {
+    res.json({ username: req.user?.username });
 });

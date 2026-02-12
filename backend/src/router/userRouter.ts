@@ -25,3 +25,7 @@ userRouter.post("/", async (req: Request, res: Response) => {
 
     res.status(StatusCodes.CREATED).send(userId);
 });
+
+userRouter.get("/companies", async (req: Request, res: Response) => {
+    res.status(StatusCodes.OK).json({companies: []});
+});

@@ -70,4 +70,33 @@ export class UserService {
         }
     }
 
+    /**
+     * 
+     * @param username username to check for
+     * @param password password to check for
+     * @returns a boolean value indicating whether the provided credentials are valid or not
+     */
+    async checkUserCredentials(username: string, password: string): Promise<boolean> {
+        try {
+            let connection = await getDBConnection();
+
+            const result: Result<UserRow> = await connection.execute(`SELECT * FROM users WHERE username = :username`, {
+                username: username
+            });
+            const user = result.rows?.[0];
+
+            await connection.close();
+            if(!user) return false;
+
+            const passwordHash: string = user.PASSWORD_HASH;
+
+            return await bcrypt.compare(password, passwordHash);
+
+        } catch(e) {
+            console.error(`Something happened whilst trying to check user credentials: ${e}`);
+
+            return false;
+        }
+    }
+
 }

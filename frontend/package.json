@@ -1,0 +1,15 @@
+{
+  "name": "economysim-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "author": "Julian Einzinger",
+  "type": "commonjs",
+  "main": "login.html",
+  "scripts": {
+    "start": "serve src -l 3800"
+  },
+  "dependencies": {
+    "serve": "^14.2.5"
+  }
+}

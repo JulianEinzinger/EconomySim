@@ -108,7 +108,6 @@ export class UserService {
     createToken(username: string): string {
         // create token with JWT
         const SECRET_KEY = "mySecretKey";
-        return jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
+        return jwt.sign({ username }, SECRET_KEY, { expiresIn: "10m" });
     }
-
 }

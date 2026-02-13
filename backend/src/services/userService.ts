@@ -1,9 +1,10 @@
 import oracledb, { type Result } from "oracledb";
 const { BIND_OUT, NUMBER } = oracledb;
 import { getDBConnection } from "../data.js";
-import type { User, UserRow } from "../model.js";
+import type { Company, CompanyRow, User, UserRow } from "../model.js";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import type { TokenPayload } from "./authService.js";
 
 export class UserService {
 
@@ -77,7 +78,7 @@ export class UserService {
      * @param password password to check for
      * @returns a boolean value indicating whether the provided credentials are valid or not
      */
-    async checkUserCredentials(username: string, password: string): Promise<boolean> {
+    async checkUserCredentials(username: string, password: string): Promise<[boolean, number]> {
         try {
             let connection = await getDBConnection();
 
@@ -87,16 +88,16 @@ export class UserService {
             const user = result.rows?.[0];
 
             await connection.close();
-            if(!user) return false;
+            if(!user) return [false, -1];
 
             const passwordHash: string = user.PASSWORD_HASH;
 
-            return await bcrypt.compare(password, passwordHash);
+            return [await bcrypt.compare(password, passwordHash), user.ID];
 
         } catch(e) {
             console.error(`Something happened whilst trying to check user credentials: ${e}`);
 
-            return false;
+            return [false, -1];
         }
     }
 
@@ -105,9 +106,37 @@ export class UserService {
      * @param username username to create the token for
      * @returns jwt token as a string
      */
-    createToken(username: string): string {
+    createToken(username: string, userId: number): string {
         // create token with JWT
         const SECRET_KEY = "mySecretKey";
-        return jwt.sign({ username }, SECRET_KEY, { expiresIn: "10m" });
+        const payload: TokenPayload = { username, userId };
+        return jwt.sign(payload, SECRET_KEY, { expiresIn: "10m" });
+    }
+
+    /**
+     * retrieves all companies owned by the user with the provided user ID
+     * @param userId the ID of the user to retrieve the companies for
+     * @returns a list of companies owned by the user, or an empty list if an error occurred
+     */
+    async getUserCompanies(userId: number): Promise<Company[]> {
+        try {
+            let connection = await getDBConnection();
+
+            const result: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT * FROM companies WHERE ownerId = :userId", {
+                userId: userId
+            })).rows ?? [];
+
+            await connection.close();
+
+            return result.map<Company>((e: CompanyRow) => ({
+                id: e.ID,
+                name: e.NAME,
+                ownerId: e.OWNER_ID
+            }));
+        } catch(e) {
+            console.error(`Something happened while retrieving user companies from database: ${e}`);
+
+            return [];
+        }
     }
 }

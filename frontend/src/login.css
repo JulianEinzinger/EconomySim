@@ -15,3 +15,16 @@ form {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 300px;
 }
+
+#login-error-text {
+    color: red;
+    font-size: 16px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+#login-error-text:empty {
+    display: none;
+    margin-top: 0;
+}

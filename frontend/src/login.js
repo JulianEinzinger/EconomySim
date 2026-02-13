@@ -23,6 +23,10 @@ loginBtn.addEventListener('click', async (e) => {
             localStorage.setItem('token', data.token); // Store token in localStorage
             
             window.location.href = `company-overview/company-overview.html`;
+        } else {
+            // login failed
+            const errorMsg = (await response.json()).message;
+            document.getElementById('login-error-text').textContent = errorMsg;
         }
         
     } catch(e) {

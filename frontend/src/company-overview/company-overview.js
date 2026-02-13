@@ -68,7 +68,48 @@ async function fetchCompanyOverview() {
             <p>Price: ${nextPriceResult === -1 ? "Loading..." : nextPriceResult}</p>
         `;
         container.appendChild(addCard);
+
+        animateCompanyCards();
     }
 }
 
 await fetchCompanyOverview();
+
+
+// ===== Theme Toggle mit Karten-Animation =====
+const themeToggle = document.getElementById("theme-toggle");
+
+// Lade gespeicherten Theme
+if(localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+    themeToggle.textContent = "☀️ Light Mode";
+}
+
+// Funktion: Karten staggered animieren
+function animateCompanyCards() {
+    const cards = document.querySelectorAll("#companies-container .company-card");
+    cards.forEach((card, index) => {
+        // reset Animation
+        card.style.animation = "none";
+        card.offsetHeight; // Trigger Reflow
+        // set Animation erneut
+        card.style.animation = `fadeInUp 0.5s forwards`;
+        card.style.animationDelay = `${index * 0.15}s`;
+    });
+}
+
+// Event Listener Theme Toggle
+themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+
+    if(document.body.classList.contains("dark")) {
+        themeToggle.textContent = "☀️ Light Mode";
+        localStorage.setItem("theme", "dark");
+    } else {
+        themeToggle.textContent = "🌙 Dark Mode";
+        localStorage.setItem("theme", "light");
+    }
+
+    // Animation erneut abspielen
+    animateCompanyCards();
+});

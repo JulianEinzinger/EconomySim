@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="found-company.css" />
+
+    <title>Found Company</title>
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <div class="form-section">
+        <h1>Application for Company Formation</h1>
+        <form id="company-formation-form">
+          <label for="company-name">Company Name:</label>
+          <input type="text" id="company-name" name="company-name" required />
+          <label for="business-type">Business Type:</label>
+          <select
+            name="business-type"
+            id="business-type-select"
+            required
+          >
+        <option value="retail">Retail</option>
+        <option value="manufacturing">Manufacturing</option>
+        <option value="services">Services</option></select>
+          <label for="location-country">Country:</label>
+          <select
+            name="location-country"
+            id="location-country-select"
+            required
+          >
+        <option value="austria">Österreich</option></select>
+          <label for="location-city">City:</label>
+          <select
+            name="location-city"
+            id="location-city-select"
+            required
+          >
+        <option value="linz">Linz</option></select>
+
+            <label for="primary-color">Primary Accent Color:</label>
+<input type="color" id="primary-color" value="#3b82f6">
+
+<label for="secondary-color">Secondary Accent Color:</label>
+<input type="color" id="secondary-color" value="#2563eb">
+
+
+          <button type="submit">Submit Application</button>
+        </form>
+      </div>
+
+      <div class="visual-section">
+    <h2>Live Preview</h2>
+
+    <div class="preview-card">
+        <h3 id="preview-name">Your Company Name</h3>
+        <p><strong>Business:</strong> <span id="preview-business">–</span></p>
+        <p><strong>Country:</strong> <span id="preview-country">–</span></p>
+        <p><strong>City:</strong> <span id="preview-city">–</span></p>
+    </div>
+</div>
+
+
+    <script src="found-company.js"></script>
+  </body>
+</html>

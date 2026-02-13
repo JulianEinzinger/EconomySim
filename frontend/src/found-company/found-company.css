@@ -1,0 +1,200 @@
+/* ===== Reset ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== Layout Wrapper ===== */
+body {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    min-height: 100vh;
+    background: #f9fafb;
+    color: #1f2937;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+/* ===== Page Container (2 Columns) ===== */
+.page-wrapper {
+    width: 100%;
+    max-width: 1100px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Left Side (Form Area) ===== */
+.form-section {
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+    opacity: 0;
+    animation: fadeInUp 0.6s forwards;
+}
+
+/* ===== Form ===== */
+#company-formation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    opacity: 0;
+    animation: fadeInUp 0.6s forwards;
+    animation-delay: 0.2s;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+input[type="text"],
+select {
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+}
+
+/* ===== Button ===== */
+button[type="submit"] {
+    margin-top: 10px;
+    padding: 14px 20px;
+    background: #3b82f6;
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* ===== Right Side (Visual Section) ===== */
+.visual-section {
+    color: white;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    transition: background 0.4s ease;
+}
+
+
+.visual-section h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.visual-section p {
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+/* Decorative Glow Circle */
+.visual-section::after {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    top: -50px;
+    right: -50px;
+    filter: blur(40px);
+}
+
+/* ===== Animation ===== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+    .page-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .visual-section {
+        display: none;
+    }
+
+    body {
+        padding: 20px;
+    }
+}
+
+
+
+/* ===== Preview Card ===== */
+.preview-card {
+    margin-top: 30px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transition: all 0.4s ease;
+    transform: translateY(10px);
+    opacity: 0;
+    animation: fadeInUp 0.6s forwards;
+    animation-delay: 0.3s;
+}
+
+.preview-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.preview-card p {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    opacity: 0.95;
+}
+
+
+
+/* ===== Color Picker Styling ===== */
+input[type="color"] {
+    height: 45px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    padding: 4px;
+    background: #f3f4f6;
+}
+
+/* Preview dynamic accent */
+.preview-card.dynamic-accent {
+    color: white;
+}

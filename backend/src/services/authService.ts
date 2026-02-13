@@ -4,8 +4,9 @@ import jwt from "jsonwebtoken";
 
 const SECRET_KEY = "mySecretKey";
 
-interface TokenPayload {
+export interface TokenPayload {
     username: string;
+    userId: number;
 }
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
@@ -16,7 +17,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 
     try {
         const payload = jwt.verify(token, SECRET_KEY) as TokenPayload;
-        req.user = { username: payload.username };
+        req.user = { username: payload.username, userId: payload.userId };
         next();
     } catch(err) {
         return res.sendStatus(StatusCodes.FORBIDDEN);

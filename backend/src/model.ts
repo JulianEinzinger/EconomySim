@@ -1,11 +1,23 @@
 export type User = {
-    id: string,
+    id: number,
     username: string,
     passwordHash: string
 }
 
 export type UserRow = {
-    ID: string,
+    ID: number,
     USERNAME: string,
     PASSWORD_HASH: string
+}
+
+export type Company = {
+    id: number,
+    name: string,
+    ownerId: number
+}
+
+export type CompanyRow = {
+    ID: number,
+    NAME: string,
+    OWNER_ID: number
 }

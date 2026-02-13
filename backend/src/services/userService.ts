@@ -5,6 +5,7 @@ import type { Company, CompanyRow, User, UserRow } from "../model.js";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import type { TokenPayload } from "./authService.js";
+import { CompanyService } from "./companyService.js";
 
 export class UserService {
 
@@ -138,5 +139,18 @@ export class UserService {
 
             return [];
         }
+    }
+
+    /**
+     * calculates the price for the next company the user would buy, based on how many companies they already own.
+     * @param userId the ID of the user to calculate the next company price for
+     * @returns the price for the next company the user would buy, based on how many companies they already own.
+     */
+    async getUserCompanyNextPrice(userId: number): Promise<number> {
+        const companies: Company[] = await this.getUserCompanies(userId);
+        const companyCount = companies.length;
+
+        const companyService = new CompanyService();
+        return companyService.calculateNextPrice(companyCount+1);
     }
 }

@@ -3,6 +3,7 @@ import { UserService } from "../services/userService.js";
 import type { User } from "../model.js";
 import { StatusCodes } from "http-status-codes";
 import { authenticateToken } from "../services/authService.js";
+import { CompanyService } from "../services/companyService.js";
 
 export const userRouter = Router();
 
@@ -40,4 +41,17 @@ userRouter.get("/companies", authenticateToken, (req: Request, res: Response) =>
 // get user by token
 userRouter.get("/me", authenticateToken, (req: Request, res: Response) => {
     res.json({ username: req.user?.username, id: req.user?.userId });
+});
+
+userRouter.get("/companies/next-price", authenticateToken, async (req: Request, res: Response) => {
+    const userService: UserService = new UserService();
+
+    const userId: number | undefined = req.user?.userId;
+
+    if(!userId) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "User ID not found in token" });
+    }
+    
+    const nextPrice: number = await userService.getUserCompanyNextPrice(userId);
+    res.status(StatusCodes.OK).json({ nextPrice });
 });

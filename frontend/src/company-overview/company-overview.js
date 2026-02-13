@@ -46,6 +46,28 @@ async function fetchCompanyOverview() {
             `;
             container.appendChild(card);
         });
+
+        // Add a container with a big plus on it at the end of the company cards for adding new companies.
+        // fetch next company price
+        let nextPriceResult = -1;
+
+        await fetch("http://localhost:3000/users/companies/next-price", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        }).then(res => res.json()).then(data => {
+            nextPriceResult = data.nextPrice;
+        });
+
+        const addCard = document.createElement("div");
+        addCard.classList.add("company-card", "add-card");
+        addCard.innerHTML = `
+            <h3>+ Add Company</h3>
+            <p>Price: ${nextPriceResult === -1 ? "Loading..." : nextPriceResult}</p>
+        `;
+        container.appendChild(addCard);
     }
 }
 

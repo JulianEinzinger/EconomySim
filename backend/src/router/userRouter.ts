@@ -27,11 +27,17 @@ userRouter.post("/", async (req: Request, res: Response) => {
     res.status(StatusCodes.CREATED).send(userId);
 });
 
-userRouter.get("/companies", async (req: Request, res: Response) => {
-    res.status(StatusCodes.OK).json({companies: []});
+
+userRouter.get("/companies", authenticateToken, (req: Request, res: Response) => {
+    const service: UserService = new UserService();
+    service.getUserCompanies(req.user!.userId).then(companies => {
+        res.json(companies);
+    }).catch(err => {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    });
 });
 
 // get user by token
 userRouter.get("/me", authenticateToken, (req: Request, res: Response) => {
-    res.json({ username: req.user?.username });
+    res.json({ username: req.user?.username, id: req.user?.userId });
 });

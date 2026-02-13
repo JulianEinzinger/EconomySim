@@ -67,6 +67,10 @@ async function fetchCompanyOverview() {
             <h3>+ Add Company</h3>
             <p>Price: ${nextPriceResult === -1 ? "Loading..." : nextPriceResult}</p>
         `;
+        addCard.onclick = () => {
+            // redirect to add company page
+            window.location.href = "../found-company/found-company.html";
+        }
         container.appendChild(addCard);
 
         animateCompanyCards();

@@ -21,3 +21,13 @@ export type CompanyRow = {
     NAME: string,
     OWNER_ID: number
 }
+
+export type Country = {
+    countryCode: string,
+    name: string
+}
+
+export type CountryRow = {
+    COUNTRY_CODE: string,
+    NAME: string
+}

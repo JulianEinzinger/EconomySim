@@ -28,7 +28,6 @@ countrySelect.addEventListener("change", updatePreview);
 citySelect.addEventListener("change", updatePreview);
 
 
-
 const primaryColorInput = document.getElementById("primary-color");
 const secondaryColorInput = document.getElementById("secondary-color");
 
@@ -73,11 +72,30 @@ function getBrightness(hex) {
     return (r * 299 + g * 587 + b * 114) / 1000;
 }
 
-
-
 // Event Listener
 primaryColorInput.addEventListener("input", updateAccentColors);
 secondaryColorInput.addEventListener("input", updateAccentColors);
 
 // Initial setzen
 updateAccentColors();
+
+
+// load countries + cities
+
+async function loadCountries() {
+
+    countrySelect.innerHTML = '';
+    const countriesResult = await fetch("http://localhost:3000/locations/countries");
+
+    if(countriesResult.ok) {
+        (await countriesResult.json()).forEach(c => {
+            const option = document.createElement("option");
+            option.text = `${c.name} - ${c.countryCode}`
+
+            countrySelect.appendChild(option);
+        });
+        
+    }
+}
+
+await loadCountries();

@@ -1,3 +1,7 @@
+import { Utils } from "../utils.js";
+
+await Utils.checkAuth();
+
 document.addEventListener("DOMContentLoaded", async () => {
     // load token
     const token = localStorage.getItem('token');

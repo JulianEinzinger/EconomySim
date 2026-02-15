@@ -1,4 +1,4 @@
-import oracledb, { type Result } from "oracledb";
+import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER } = oracledb;
 import { getDBConnection } from "../data.js";
 import type { Company, CompanyRow, User, UserRow } from "../model.js";
@@ -152,5 +152,31 @@ export class UserService {
 
         const companyService = new CompanyService();
         return companyService.calculateNextPrice(companyCount+1);
+    }
+
+    /**
+     * retrieves the balance of the user with the provided user ID
+     * @param userId the ID of the user to retrieve the balance for
+     * @returns the balance of the user, or 0 if an error occurred
+     */
+    async getUserBalance(userId: number): Promise<number> { 
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result: Result<{ balance: number }> = (await connection.execute<{ balance: number }>("SELECT u.balance FROM users u WHERE u.id = :userId", {
+                userId: userId
+             }));
+
+            if(!result.rows || result.rows.length === 0) throw new Error("No user found with the provided ID!");
+
+            const balance: number = result.rows[0]?.balance ?? 0;
+            
+            await connection.close();
+
+            return balance;
+        } catch(err) {
+            console.error(`Something happened while trying to retrieve user balance from db: ${err}`);
+            return 0;
+        }
     }
 }

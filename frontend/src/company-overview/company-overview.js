@@ -2,24 +2,23 @@ import { Utils } from "../utils.js";
 
 await Utils.checkAuth();
 
-document.addEventListener("DOMContentLoaded", async () => {
-    // load token
-    const token = localStorage.getItem('token');
+// load token
+const token = localStorage.getItem('token');
 
-    // fetch company overview data
-    const result = await fetch("http://localhost:3000/users/me", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    });
-
-    if(result.ok) {
-        const userData = await result.json();
-        document.getElementById("tmp").textContent = `Welcome, ${userData.username}!`;
+// fetch company overview data
+const result = await fetch("http://localhost:3000/users/me", {
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
     }
 });
+
+if(result.ok) {
+    const userData = await result.json();
+    document.getElementById("tmp").textContent = `Welcome, ${userData.username}!`;
+    console.log("A");  
+}
 
 // TODO: fetch and display company overview data in the #companies-container element.
 // company fetch url is http://localhost:3000/users/companies, method is GET, and it also requires the same Authorization header as the user info fetch.

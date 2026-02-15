@@ -23,3 +23,18 @@ Content-Type: application/json
     "username": "GAMING1707",
     "password": "Passwort123!"
 }
+
+###
+
+POST {{baseUrl}}/business
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkdBTUlORzE3MDciLCJ1c2VySWQiOjUsImlhdCI6MTc3MTE2OTExNSwiZXhwIjoxNzcxMTY5NzE1fQ.GOcdEwNJWNGHH1jlnfS8Mf8Cx07fNoqMvIHDTMFFGmw
+
+{
+    "name": "Tech Innovators Inc.",
+    "businessTypeId": 1,
+    "countryCode": "AT",
+    "city": "Salzburg",
+    "primaryColor": "#FF5733",
+    "secondaryColor": "#C70039"
+}

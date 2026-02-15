@@ -131,8 +131,24 @@ function updateCityOptions() {
     updatePreview();
 }
 
+async function loadBusinessTypes() {
+    businessSelect.innerHTML = '';
+    const businessTypesResult = await fetch("http://localhost:3000/business/businessTypes");
+
+    if(businessTypesResult.ok) {
+        (await businessTypesResult.json()).forEach(bt => {
+            const option = document.createElement("option");
+            option.text = bt.name;
+            option.value = bt.id;
+
+            businessSelect.appendChild(option);
+        });
+    }
+}
+
 await loadCountries();
 await loadCities();
+await loadBusinessTypes();
 
 updateCityOptions();
 

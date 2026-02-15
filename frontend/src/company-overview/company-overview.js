@@ -45,7 +45,7 @@ async function fetchCompanyOverview() {
             card.classList.add("company-card");
             card.innerHTML = `
                 <h3>${company.name} (${company.id})</h3>
-                <p>Industry: NotYetImplemented</p>
+                <p>${company.businessType} Business</p>
             `;
             container.appendChild(card);
         });

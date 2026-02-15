@@ -41,3 +41,13 @@ export type CityRow = {
     NAME: string,
     COUNTRY_CODE: string
 }
+
+export type BusinessType = {
+    id: number,
+    name: string
+}
+
+export type BusinessTypeRow = {
+    ID: number,
+    NAME: string
+}

@@ -3,6 +3,7 @@ import cors from "cors";
 import { userRouter } from "./router/userRouter.js";
 import { loginRouter } from "./router/loginRouter.js";
 import { locationRouter } from "./router/locationRouter.js";
+import { businessRouter } from "./router/businessRouter.js";
 
 
 const PORT = 3000;
@@ -15,6 +16,7 @@ app.use(cors());
 app.use("/users", userRouter);
 app.use("/login", loginRouter);
 app.use("/locations", locationRouter);
+app.use("/business", businessRouter);
 
 app.listen(PORT, () => console.log(`Server listening on: http://localhost:${PORT}`)
 );

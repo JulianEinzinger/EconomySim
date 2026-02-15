@@ -1,3 +1,5 @@
+import { Utils } from "../utils.js";
+
 const nameInput = document.getElementById("company-name");
 const businessSelect = document.getElementById("business-type-select");
 const countrySelect = document.getElementById("location-country-select");
@@ -145,6 +147,8 @@ async function loadBusinessTypes() {
         });
     }
 }
+
+await Utils.checkAuth();
 
 await loadCountries();
 await loadCities();

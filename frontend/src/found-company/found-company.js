@@ -10,6 +10,8 @@ const previewBusiness = document.getElementById("preview-business");
 const previewCountry = document.getElementById("preview-country");
 const previewCity = document.getElementById("preview-city");
 
+const feesDisplay = document.getElementById("fees-display");
+
 function updatePreview() {
     previewName.textContent = nameInput.value || "Your Company Name";
 
@@ -148,11 +150,30 @@ async function loadBusinessTypes() {
     }
 }
 
+async function loadCompanyPrice() {
+    const token = localStorage.getItem('token');
+
+    const result = await fetch("http://localhost:3000/users/companies/next-price", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    if(result.ok) {
+        const data = await result.json();
+
+        feesDisplay.innerHTML = `${data.nextPrice.toLocaleString('de-DE')}€`
+    }
+}
+
 await Utils.checkAuth();
 
 await loadCountries();
 await loadCities();
 await loadBusinessTypes();
+await loadCompanyPrice();
 
 updateCityOptions();
 

@@ -57,7 +57,7 @@ h1 {
     animation-delay: 0.2s;
 }
 
-label {
+label, p {
     font-weight: 600;
     margin-bottom: 6px;
     font-size: 0.9rem;
@@ -197,4 +197,9 @@ input[type="color"] {
 /* Preview dynamic accent */
 .preview-card.dynamic-accent {
     color: white;
+}
+
+/* ===== Fees display ===== */
+#fees-display {
+    color: rgb(46, 88, 48);
 }

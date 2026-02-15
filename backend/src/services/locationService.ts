@@ -1,6 +1,6 @@
 import type { Connection } from "oracledb";
 import { getDBConnection } from "../data.js";
-import type { Country, CountryRow } from "../model.js";
+import type { City, CityRow, Country, CountryRow } from "../model.js";
 
 export class LocationService {
 
@@ -22,6 +22,28 @@ export class LocationService {
             }));
         } catch(err) {
             console.error(`Something happened while trying to retrieve countries from database: ${err}`)
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves all cities from the database.
+     * @returns a list of cities, or null if an error occurs.
+     */
+    public async getAllCities(): Promise<City[] | null> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result: CityRow[] = (await connection.execute<CityRow>("SELECT * FROM cities")).rows ?? [];
+
+            await connection.close();
+
+            return result.map<City>(cr => ({
+                name: cr.NAME,
+                countryCode: cr.COUNTRY_CODE
+            }));
+        } catch(err) {
+            console.error(`Something happened while trying to retrieve cities from database: ${err}`);
             return null;
         }
     }

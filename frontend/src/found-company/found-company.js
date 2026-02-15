@@ -24,7 +24,6 @@ function updatePreview() {
 // Event Listener
 nameInput.addEventListener("input", updatePreview);
 businessSelect.addEventListener("change", updatePreview);
-countrySelect.addEventListener("change", updatePreview);
 citySelect.addEventListener("change", updatePreview);
 
 
@@ -91,6 +90,7 @@ async function loadCountries() {
         (await countriesResult.json()).forEach(c => {
             const option = document.createElement("option");
             option.text = `${c.name} - ${c.countryCode}`
+            option.value = c.countryCode;
 
             countrySelect.appendChild(option);
         });
@@ -98,4 +98,42 @@ async function loadCountries() {
     }
 }
 
+const cities = new Map();
+
+async function loadCities() {
+    citySelect.innerHTML = '';
+    const citiesResult = await fetch(`http://localhost:3000/locations/cities`);
+
+    if(citiesResult.ok) {
+        (await citiesResult.json()).forEach(c => {
+            if(!cities.has(c.countryCode)) {
+                cities.set(c.countryCode, []);
+            }
+            cities.get(c.countryCode).push(c);
+        });
+    }
+}
+
+function updateCityOptions() {
+    const selectedCountry = countrySelect.value;
+    citySelect.innerHTML = '';
+
+    if(cities.has(selectedCountry)) {
+        cities.get(selectedCountry).forEach(city => {
+            const option = document.createElement("option");
+            option.text = city.name;
+            option.value = `${city.name};${city.countryCode}`;
+
+            citySelect.appendChild(option);
+        });
+    }
+
+    updatePreview();
+}
+
 await loadCountries();
+await loadCities();
+
+updateCityOptions();
+
+countrySelect.addEventListener("change", updateCityOptions);

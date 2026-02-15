@@ -13,13 +13,25 @@ export type UserRow = {
 export type Company = {
     id: number,
     name: string,
-    ownerId: number
+    ownerId: number,
+    businessTypeId: number
 }
 
 export type CompanyRow = {
     ID: number,
     NAME: string,
-    OWNER_ID: number
+    OWNER_ID: number,
+    BUSINESS_TYPE_ID: number,
+    BUSINESS_TYPE_NAME: string
+}
+
+/**
+ * type for frontend, including only fields that are being displayed in the frontend
+ */
+export type CompanyDTO = {
+    id: number,
+    name: string,
+    businessType: string
 }
 
 export type Country = {

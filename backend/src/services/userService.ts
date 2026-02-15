@@ -1,7 +1,7 @@
 import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER } = oracledb;
 import { getDBConnection } from "../data.js";
-import type { Company, CompanyRow, User, UserRow } from "../model.js";
+import type { Company, CompanyDTO, CompanyRow, User, UserRow } from "../model.js";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import type { TokenPayload } from "./authService.js";
@@ -119,20 +119,20 @@ export class UserService {
      * @param userId the ID of the user to retrieve the companies for
      * @returns a list of companies owned by the user, or an empty list if an error occurred
      */
-    async getUserCompanies(userId: number): Promise<Company[]> {
+    async getUserCompanies(userId: number): Promise<CompanyDTO[]> {
         try {
             let connection = await getDBConnection();
 
-            const result: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT * FROM companies WHERE ownerId = :userId", {
+            const result: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT c.*, bt.name as BUSINESS_TYPE_NAME FROM companies c JOIN business_types bt ON c.business_type_id = bt.id WHERE c.ownerId = :userId", {
                 userId: userId
             })).rows ?? [];
 
             await connection.close();
 
-            return result.map<Company>((e: CompanyRow) => ({
+            return result.map<CompanyDTO>((e: CompanyRow) => ({
                 id: e.ID,
                 name: e.NAME,
-                ownerId: e.OWNER_ID
+                businessType: e.BUSINESS_TYPE_NAME
             }));
         } catch(e) {
             console.error(`Something happened while retrieving user companies from database: ${e}`);
@@ -147,7 +147,7 @@ export class UserService {
      * @returns the price for the next company the user would buy, based on how many companies they already own.
      */
     async getUserCompanyNextPrice(userId: number): Promise<number> {
-        const companies: Company[] = await this.getUserCompanies(userId);
+        const companies: CompanyDTO[] = await this.getUserCompanies(userId);
         const companyCount = companies.length;
 
         const companyService = new CompanyService();

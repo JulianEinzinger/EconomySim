@@ -31,3 +31,13 @@ export type CountryRow = {
     COUNTRY_CODE: string,
     NAME: string
 }
+
+export type City = {
+    name: string,
+    countryCode: string
+}
+
+export type CityRow = {
+    NAME: string,
+    COUNTRY_CODE: string
+}

@@ -12,6 +12,8 @@ const previewCity = document.getElementById("preview-city");
 
 const feesDisplay = document.getElementById("fees-display");
 
+const companyForm = document.getElementById("company-formation-form");
+
 function updatePreview() {
     previewName.textContent = nameInput.value || "Your Company Name";
 
@@ -167,6 +169,40 @@ async function loadCompanyPrice() {
         feesDisplay.innerHTML = `${data.nextPrice.toLocaleString('de-DE')}€`
     }
 }
+
+companyForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); // verhindert Page-Reload
+
+    const token = localStorage.getItem('token');
+
+    const payload = {
+        name: nameInput.value,
+        businessTypeId: businessSelect.value,
+        countryCode: countrySelect.value,
+        city: citySelect.value.split(';')[0],
+        primaryColor: primaryColorInput.value,
+        secondaryColor: secondaryColorInput.value
+    };
+
+    console.log(payload);
+    
+
+    const response = await fetch("http://localhost:3000/business", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if(response.ok) {
+        // Company erfolgreich gegründet
+        window.location.href = '../company-overview/company-overview.html';
+    } else {
+        console.error(`Company founding failed: ${await response.text()}`);
+    }
+});
 
 await Utils.checkAuth();
 

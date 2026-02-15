@@ -6,7 +6,7 @@ export class LocationService {
 
     /**
      * Retrieves all countries from the database.
-     * @returns a list of countries, or an empty list if an error occurs.
+     * @returns a list of countries, or null if an error occurs.
      */
     public async getAllCountries(): Promise<Country[] | null> {
         try {

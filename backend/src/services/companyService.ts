@@ -1,3 +1,8 @@
+import oracledb, { type Connection, type Result } from "oracledb";
+const { BIND_OUT, NUMBER } = oracledb
+import { getDBConnection } from "../data.js";
+import { UserService } from "./userService.js";
+
 export class CompanyService {
     public async calculateNextPrice(companyCount: number): Promise<number> {
         if(companyCount == 1) return 0; // First company is free
@@ -6,5 +11,69 @@ export class CompanyService {
         const growthFactor = 1.85; // Growth factor for subsequent companies
 
         return basePrice * Math.pow(growthFactor, companyCount - 2);
+    }
+
+    /**
+     * Tries to found a new company for the user with the given parameters. Checks if the user has enough balance to found a new company, and if so, creates the company.
+     * @param userId 
+     * @param name 
+     * @param businessTypeId 
+     * @param countryCode 
+     * @param cityName 
+     * @param primaryColor 
+     * @param secondaryColor 
+     * @returns the company-id of the new company, or -1 if failed, and a message describing the result
+     */
+    public async foundNewCompany(userId: number, name: string, businessTypeId: number, 
+        countryCode: string, cityName: string, primaryColor: string, secondaryColor: string): Promise<[number, string]> {
+            const userService: UserService = new UserService();
+
+            const balance: number = await userService.getUserBalance(userId);
+            const nextPrice: number = await userService.getUserCompanyNextPrice(userId);
+
+            if(balance < nextPrice) return [-1, "Balance not sufficient!"];
+
+            const [companyId, msg]: [number, string] = await this.createNewCompany(userId, name, businessTypeId, countryCode, cityName, primaryColor, secondaryColor);
+            return [companyId, msg];
+        }
+
+    /**
+     * @returns company-id of the new company, or -1 if failed
+     */
+    private async createNewCompany(userId: number, name: string, businessTypeId: number, 
+        countryCode: string, cityName: string, primaryColor: string, secondaryColor: string): Promise<[number, string]> {
+            console.log(`Params: ${userId}, ${name}, ${businessTypeId}, ${countryCode}, ${cityName}, ${primaryColor}, ${secondaryColor}`);
+            
+
+            try {
+                const connection: Connection = await getDBConnection();
+
+                const result: Result<{ id: number[] }> = await connection.execute<{ id: number[] }>(`INSERT INTO companies (name, ownerid, country_code, city_name, business_type_id, 
+                    primary_color, secondary_color) VALUES (:name, :ownerid, :countryCode, :cityname, :businessTypeId, :primaryColor, :secondaryColor)
+                    RETURNING id INTO :id`, ({
+                        name: name,
+                        ownerid: userId,
+                        countryCode: countryCode,
+                        cityName: cityName,
+                        businessTypeId: businessTypeId,
+                        primaryColor: primaryColor,
+                        secondaryColor: secondaryColor,
+                        id: { dir: BIND_OUT, type: NUMBER }
+                    }));
+
+                if(!result.outBinds) throw new Error("SQL Outbinds are empty!");
+
+                const companyId = result.outBinds.id[0];
+
+                if(!companyId) throw new Error("Failed to retrieve company ID from database!");
+
+                await connection.commit();
+                await connection.close();
+
+                return [companyId, `Successfully founded company ${name}!`];
+            } catch(err) {
+                console.error(`Something happened while trying to create a new company: ${err}`);
+                return [-1, `Failed to create company: ${err}`];
+            }
     }
 }

@@ -4,6 +4,8 @@
 1. [Pages](#pages)
 2. [Game Design Ideas](#game-design-ideas)
     1. [Company-Slot Price Formula](#company-slot-price-scaling-formula)
+    2. [Business Types](#business-types)
+       1. [Retail](#retail)
 
 
 ## Pages
@@ -52,3 +54,19 @@ SlotCost(n) = Basecost * (Growthfactor ^{n-2}) * (1 + Assets / 1.000.000)
 
 Basecost = 10.000 <br>
 Growthfactor = 1.85
+
+### Business Types
+
+#### Retail
+
+The player can set opening times, and has a option to open/close the company. When the company is open, available items could possibly be sold to customers(automatic sale generator).
+
+So, the player buys end-products from the commodity exchange(Warenbörse) in large amounts (e.g. 100stacks, 1.000 stacks, ...). 
+<br>
+[💡 idea] Depending on where you buy the items from, they take longer to arrive, based on where your company is located. (probably a bit complicated scaling time, so that it doesn't take too long, but is still realistic)
+<br>
+On arrival, the items get stored in the warehouse, which of course has limited space.
+<br>
+The warehouse capacity can be upgraded with money.
+<br>
+The player can choose for each item in the warehouse wether to put it up for sale, or maybe just a specific amount and set its price(option to set it netto and brutto getting calculated and vice versa.

@@ -47,6 +47,10 @@ async function fetchCompanyOverview() {
                 <h3>${company.name} (${company.id})</h3>
                 <p>${company.businessType} Business</p>
             `;
+            card.onclick = () => {
+                // redirect to company dashboard page
+                window.location.href = `../company-dashboard/company-dashboard.html#companyId=${company.id}`;
+            }
             container.appendChild(card);
         });
 

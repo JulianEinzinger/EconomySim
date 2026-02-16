@@ -2,6 +2,7 @@ import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER } = oracledb
 import { getDBConnection } from "../data.js";
 import { UserService } from "./userService.js";
+import type { Company, CompanyRow } from "../model.js";
 
 export class CompanyService {
     public async calculateNextPrice(companyCount: number): Promise<number> {
@@ -75,5 +76,71 @@ export class CompanyService {
                 console.error(`Something happened while trying to create a new company: ${err}`);
                 return [-1, `Failed to create company: ${err}`];
             }
+    }
+
+    /**
+     * Checks if a company is owned by a specific user.
+     * @param companyId the id of the company to check ownership for
+     * @param userId the id of the user to check ownership for
+     * @returns true if the company is owned by the user, false otherwise
+     */
+    private async isCompanyOwnedByUser(companyId: number, userId: number): Promise<boolean> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const rows: { COUNT: number }[] = (await connection.execute<{ COUNT: number }>(`SELECT COUNT(*) AS COUNT FROM companies WHERE id = :companyId AND ownerid = :userId`, {
+                companyId: companyId,
+                userId: userId
+            })).rows ?? [];
+
+
+            await connection.close();
+            if(rows && rows.length > 0) {
+                const count: number = rows[0]?.COUNT ?? 0;
+                
+                return count > 0;
+            }
+            return false;
+        } catch(err) {
+            console.error(`Error checking company ownership: ${err}`);
+            return false;
+        }
+    }
+
+    /**
+     * Returns a company if it exists and is owned by the specified user.
+     * @param companyId 
+     * @param userId 
+     * @returns ret
+     */
+    public async getCompanyByIdForUser(companyId: number, userId: number): Promise<Company | "forbidden" | null> {
+        try {
+            // First check if the company is owned by the user
+            const isOwned: boolean = await this.isCompanyOwnedByUser(companyId, userId);
+
+            if(!isOwned) return "forbidden";
+
+            const connection: Connection = await getDBConnection();
+
+            const rows: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT * FROM companies WHERE id = :companyId", {
+                companyId: companyId
+            })).rows ?? [];
+
+            await connection.close();
+
+            if(rows.length === 0 || !rows[0]) return null;
+
+            const row: CompanyRow = rows[0];
+
+            return ({
+                id: row.ID,
+                name: row.NAME,
+                ownerId: row.OWNER_ID,
+                businessTypeId: row.BUSINESS_TYPE_ID
+            });
+        } catch(err) {
+            console.error(`Error fetching company by ID for user: ${err}`);
+            return null;
+        }
     }
 }

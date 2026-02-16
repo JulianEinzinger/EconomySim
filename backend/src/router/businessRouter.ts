@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { BusinessService } from "../services/businessService.js";
-import type { BusinessType } from "../model.js";
+import type { BusinessType, Company } from "../model.js";
 import { StatusCodes } from "http-status-codes";
 import { authenticateToken } from "../services/authService.js";
 import { CompanyService } from "../services/companyService.js";
@@ -33,5 +33,26 @@ businessRouter.post("/", authenticateToken, async (req: Request, res: Response) 
         res.status(StatusCodes.BAD_REQUEST).json({ message: msg });
     } else {
         res.status(StatusCodes.OK).json({ companyId: companyId, message: msg });
+    }
+});
+
+businessRouter.get("/companies/:companyId", authenticateToken, async (req: Request, res: Response) => {
+    const companyId: number = Number(req.params.companyId);
+    if(isNaN(companyId)) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid company ID" });
+    }
+
+    const service: CompanyService = new CompanyService();
+    const userId: number = req.user!.userId;
+    
+
+    const company = await service.getCompanyByIdForUser(companyId, userId);
+
+    if(company === "forbidden") {
+        res.status(StatusCodes.FORBIDDEN).json({ message: "You do not have access to this company" });
+    } else if(!company) {
+        res.status(StatusCodes.NOT_FOUND).json({ message: "Company not found" });
+    } else {
+        res.status(StatusCodes.OK).json(company);
     }
 });

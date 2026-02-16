@@ -7,9 +7,9 @@
   "type": "commonjs",
   "main": "login.html",
   "scripts": {
-    "start": "serve src -l 3800"
+    "start": "vite src --port 3800"
   },
   "dependencies": {
-    "serve": "^14.2.5"
+    "vite": "^7.3.1"
   }
 }

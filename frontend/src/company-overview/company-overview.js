@@ -49,7 +49,7 @@ async function fetchCompanyOverview() {
             `;
             card.onclick = () => {
                 // redirect to company dashboard page
-                window.location.href = `../company-dashboard/company-dashboard.html#companyId=${company.id}`;
+                window.location.href = `../company-dashboard/company-dashboard.html?companyId=${company.id}`;
             }
             container.appendChild(card);
         });

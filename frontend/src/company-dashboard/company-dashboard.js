@@ -2,7 +2,7 @@ import { Utils } from "../utils.js";
 
 await Utils.checkAuth();
 
-const params = new URLSearchParams(window.location.hash.replace("#", "?"));
+const params = new URLSearchParams(window.location.search);
 const companyId = params.get('companyId');
 
 async function loadCompanyData() {

@@ -6,6 +6,7 @@
     1. [Company-Slot Price Formula](#company-slot-price-scaling-formula)
     2. [Business Types](#business-types)
        1. [Retail](#retail)
+          1. [Page Layout](#retail-pages)
 
 
 ## Pages
@@ -62,11 +63,24 @@ Growthfactor = 1.85
 The player can set opening times, and has a option to open/close the company. When the company is open, available items could possibly be sold to customers(automatic sale generator).
 
 So, the player buys end-products from the commodity exchange(Warenbörse) in large amounts (e.g. 100stacks, 1.000 stacks, ...). 
-<br>
+
 [💡 idea] Depending on where you buy the items from, they take longer to arrive, based on where your company is located. (probably a bit complicated scaling time, so that it doesn't take too long, but is still realistic)
-<br>
+
 On arrival, the items get stored in the warehouse, which of course has limited space.
-<br>
+
 The warehouse capacity can be upgraded with money.
-<br>
+
 The player can choose for each item in the warehouse wether to put it up for sale, or maybe just a specific amount and set its price(option to set it netto and brutto getting calculated and vice versa.
+
+##### Page Layout <a name="retail-pages"/>
+###### Dashboard-Page:
+
+Overview of number of sold Items in the last 24h, sales in the last 24h, profit in the last 24h
+
+###### Inventory-Page
+
+Overview of the inventory, including it's current size(in m³?) and the items stored currently, and a possibility to ourchase more space.
+
+###### Economics-Page
+
+Overview of all-time sales, profit, loss, best product. Some form of profit-and-loss statement, a possibility to take a loan from the bank, and to deposit/withdraw money to generate deposit interest and having to pay interest on the credit.

@@ -7,6 +7,10 @@
     2. [Business Types](#business-types)
        1. [Retail](#retail)
           1. [Page Layout](#retail-pages)
+             1. [Dashboard](#retail-dashboard)
+             2. [Inventory](#retail-inventory)
+             3. [Economics](#retail-economics)
+             4. [Purchase](#retail-purchase)
 
 
 ## Pages
@@ -73,14 +77,31 @@ The warehouse capacity can be upgraded with money.
 The player can choose for each item in the warehouse wether to put it up for sale, or maybe just a specific amount and set its price(option to set it netto and brutto getting calculated and vice versa.
 
 ##### Page Layout <a name="retail-pages"/>
-###### Dashboard-Page:
+###### Dashboard-Page <a name="retail-dashboard"/>
 
 Overview of number of sold Items in the last 24h, sales in the last 24h, profit in the last 24h
 
-###### Inventory-Page
+###### Inventory-Page <a name="retail-inventory"/>
 
 Overview of the inventory, including it's current size(in m³?) and the items stored currently, and a possibility to ourchase more space.
 
-###### Economics-Page
-
+###### Economics-Page <a name="retail-economics"/>
+ 
 Overview of all-time sales, profit, loss, best product. Some form of profit-and-loss statement, a possibility to take a loan from the bank, and to deposit/withdraw money to generate deposit interest and having to pay interest on the credit.
+
+###### Purchase-Page <a name="retail-purchase"/>
+
+On the Purchase Page, the player accesses the commodity exchange and can choose from a variety of wholesalers. These differ in location, available supply and price. 
+After selecting a wholesaler, the player is presented with an overview of all available products. For each product, the following information is displayed:
+
+- order unit(stack size)
+- price per stack
+- volume per stack
+
+The player can add or remove products from the shopping cart and sees the **current total price updated in real time.**
+
+Improvement ideas:
+
+- Implement delivery time based on the wholesaler's location and the player's company.
+- Add shipping costs that scale with distance and order volume.
+- VAT handling, including reclaiming input tax from the tax office.

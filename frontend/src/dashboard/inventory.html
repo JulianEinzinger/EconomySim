@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory</title>
+
+    <!-- Montserrat Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap">
+
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <link rel="stylesheet" href="inventory.css">
+</head>
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+            <div class="header-left">
+                <span class="material-icons-outlined">search</span>
+            </div>
+            <div class="header-right">
+                <span class="material-icons-outlined">notifications</span>
+                <span class="material-icons-outlined">mail</span>
+                <span class="material-icons-outlined">account_circle</span>
+            </div>
+        </header>
+
+        <aside id="sidebar">
+            <div class="sidebar-title">
+                <div class="sidebar-logo">
+                    <span class="material-icons-outlined">inventory</span> &lt;Company name&gt;
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <ul class="sidebar-list">
+                <li>
+                    <a href="dashboard.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">dashboard</span> Dashboard
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="inventory.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">warehouse</span> Inventory
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="economics.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">analytics</span> Economics
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="purchase.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">add_shopping_cart</span> Purchase
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="settings.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">settings</span> Settings
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-container">
+            <div class="main-title">
+                <p class="font-weight-bold">INVENTORY</p>
+                <p>USED: 41/50</p>
+            </div>
+            <div class="main-item-cards">
+                <div class="item-card">
+                    <div class="card-inner">
+                        <img src="resources/imgs/apple.webp" alt="Apple" class="item-img">
+                        <p class="item-name">Apple · 13</p>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="card-inner">
+                        <img src="resources/imgs/water_bottle.webp" alt="Waterbottle" class="item-img">
+                        <p class="item-name">Waterbottle · 28</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

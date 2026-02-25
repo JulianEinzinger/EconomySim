@@ -77,25 +77,66 @@
         </aside>
 
         <main class="main-container">
-            <div class="main-title">
-                <p class="font-weight-bold">INVENTORY</p>
-                <p>USED: 41/50</p>
-            </div>
-            <div class="main-item-cards">
-                <div class="item-card">
-                    <div class="card-inner">
-                        <img src="resources/imgs/apple.webp" alt="Apple" class="item-img">
-                        <p class="item-name">Apple · 13</p>
-                    </div>
-                </div>
-                <div class="item-card">
-                    <div class="card-inner">
-                        <img src="resources/imgs/water_bottle.webp" alt="Waterbottle" class="item-img">
-                        <p class="item-name">Waterbottle · 28</p>
-                    </div>
-                </div>
-            </div>
-        </main>
+    <div class="main-title">
+        <p class="font-weight-bold">INVENTORY</p>
+        <button class="btn-secondary">
+            <span class="material-icons-outlined">filter_list</span>
+            Filter
+        </button>
+    </div>
+
+    <div class="inventory-table-wrapper">
+        <table class="inventory-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="item-cell">
+                        <img src="resources/imgs/bottled_water.png" alt="Steel">
+                        <span>Kasten Mineralwasser 12x1L</span>
+                    </td>
+                    <td>Goods</td>
+                    <td>56</td>
+                    <td>Stk</td>
+                    <td><span class="status ok">OK</span></td>
+                    <td>Warehouse A</td>
+                </tr>
+
+                <tr>
+                    <td class="item-cell">
+                        <img src="resources/imgs/oil.png" alt="Oil">
+                        <span>Crude Oil</span>
+                    </td>
+                    <td>Liquid</td>
+                    <td>320</td>
+                    <td>l</td>
+                    <td><span class="status low">Low</span></td>
+                    <td>Tank 2</td>
+                </tr>
+
+                <tr>
+                    <td class="item-cell">
+                        <img src="resources/imgs/iron_ore.png" alt="Oil">
+                        <span>Iron Ore</span>
+                    </td>
+                    <td>Raw Material</td>
+                    <td>-</td>
+                    <td>kg</td>
+                    <td><span class="status empty">Empty</span></td>
+                    <td>Warehouse A</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
     </div>
 
     <script src="dashboard.js"></script>

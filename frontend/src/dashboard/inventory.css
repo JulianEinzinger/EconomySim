@@ -138,3 +138,83 @@ a {
 .font-weight-bold {
     font-weight: bold;
 }
+
+/* ---------- INVENTORY ---------- */
+
+.inventory-table-wrapper {
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 6px 7px -4px rgba(0,0,0,0.2);
+}
+
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.inventory-table th {
+    text-align: left;
+    font-size: 14px;
+    color: #999;
+    padding-bottom: 15px;
+}
+
+.inventory-table td {
+    padding: 15px 0;
+    border-top: 1px solid #eee;
+    font-size: 15px;
+}
+
+.item-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.item-cell img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    background-color: #f4f6fb;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+/* Status Pills */
+
+.status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status.ok {
+    background-color: #e4f3eb;
+    color: #367952;
+}
+
+.status.low {
+    background-color: #fff2dd;
+    color: #f5b74f;
+}
+
+.status.empty {
+    background-color: #fde8ea;
+    color: #cc3c43;
+}
+
+/* Button */
+
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #f4f6fb;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+}

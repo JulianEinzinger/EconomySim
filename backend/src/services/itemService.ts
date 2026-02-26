@@ -1,5 +1,5 @@
 import type { Connection } from "oracledb";
-import type { Product, ProductRow } from "../model.js";
+import { type InventoryItem, type InventoryItemRow, type Product, type ProductRow, type Warehouse, type WarehouseRow } from "../model.js";
 import { getDBConnection } from "../data.js";
 
 export class ItemService {
@@ -28,6 +28,37 @@ export class ItemService {
             return null;
         }
     }
+
+    /**
+     * Retrieves all inventory items for a specific warehouse.
+     * @param warehouseId 
+     * @returns 
+     */
+    public async getItemsByWarehouseId(warehouseId: number): Promise<InventoryItem[] | null> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result: InventoryItemRow[] = (await connection.execute<InventoryItemRow>("SELECT wi.*, p.*, pc.name AS PRODUCT_CATEGORY FROM warehouse_items wi JOIN products p ON wi.product_id = p.id JOIN product_categories pc ON p.product_category_id = pc.id WHERE wi.warehouse_id = :warehouseId", {
+                warehouseId: warehouseId
+            })).rows ?? [];
+        
+            await connection.close();
+
+            return result.map<InventoryItem>(ir => ({
+                id: ir.ID,
+                name: ir.NAME,
+                imgUrl: ir.IMG_URL,
+                product_category: ir.PRODUCT_CATEGORY,
+                unit: ir.UNIT,
+                quantity: ir.QUANTITY,
+                companyId: ir.COMPANY_ID
+            }));
+        } catch(err) {
+            console.error(`Something happened while trying to retrieve InventoryItems: ${err}`);
+            return null;
+        }
+    }
+
     /**
      * Retrieves all warehouses for a specific company.
      * @param companyId 

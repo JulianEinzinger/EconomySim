@@ -84,7 +84,7 @@ export class CompanyService {
      * @param userId the id of the user to check ownership for
      * @returns true if the company is owned by the user, false otherwise
      */
-    private async isCompanyOwnedByUser(companyId: number, userId: number): Promise<boolean> {
+    public async isCompanyOwnedByUser(companyId: number, userId: number): Promise<boolean> {
         try {
             const connection: Connection = await getDBConnection();
 
@@ -140,6 +140,30 @@ export class CompanyService {
             });
         } catch(err) {
             console.error(`Error fetching company by ID for user: ${err}`);
+            return null;
+        }
+    }
+
+    /**
+     * Returns the company ID for a given warehouse ID, or null if the warehouse does not exist or an error occurs.
+     * @param warehouseId 
+     * @returns 
+     */
+    public async getCompanyIdForWarehouseId(warehouseId: number): Promise<number | null> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result: { COMPANY_ID: number}[] = (await connection.execute<{ COMPANY_ID: number }>(`SELECT COMPANY_ID FROM warehouses WHERE ID = :warehouseId`, {
+                warehouseId: warehouseId
+            })).rows ?? [];
+
+            await connection.close();
+
+            if(result.length === 0 || !result[0]) return null;
+
+            return result[0].COMPANY_ID;
+        } catch(err) {
+            console.error(`Error fetching company ID for warehouse ID: ${err}`);
             return null;
         }
     }

@@ -1,9 +1,10 @@
 import { Router, type Request, type Response } from "express";
 import { BusinessService } from "../services/businessService.js";
-import type { BusinessType, Company } from "../model.js";
+import type { BusinessType, Company, Warehouse } from "../model.js";
 import { StatusCodes } from "http-status-codes";
 import { authenticateToken } from "../services/authService.js";
 import { CompanyService } from "../services/companyService.js";
+import { ItemService } from "../services/itemService.js";
 
 export const businessRouter = Router();
 
@@ -54,5 +55,30 @@ businessRouter.get("/companies/:companyId", authenticateToken, async (req: Reque
         res.status(StatusCodes.NOT_FOUND).json({ message: "Company not found" });
     } else {
         res.status(StatusCodes.OK).json(company);
+    }
+});
+
+// get all warehouses for a specific company
+businessRouter.get("/companies/:companyId/warehouses", authenticateToken, async (req: Request, res: Response) => {
+    const companyId: number = Number(req.params.companyId);
+    if(isNaN(companyId)) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid company ID" });
+    }
+
+    const companyService: CompanyService = new CompanyService();
+    const itemService: ItemService = new ItemService();
+    const userId: number = req.user!.userId;
+
+    // check if the company belongs to the user
+    if(!await companyService.isCompanyOwnedByUser(companyId, userId)) {
+        return res.status(StatusCodes.FORBIDDEN).json({ message: "You do not have access to this company's warehouses" });
+    }
+
+    const warehouses: Warehouse[] | null = await itemService.getWarehousesByCompanyId(companyId);
+
+    if(!warehouses) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: `Error fetching warehouses for company id: ${companyId}` });
+    } else {
+        res.status(StatusCodes.OK).json(warehouses);
     }
 });

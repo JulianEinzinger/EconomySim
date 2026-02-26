@@ -2,6 +2,8 @@
 @port=3000
 @baseUrl={{host}}:{{port}}
 
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkdBTUlORzE3MDciLCJ1c2VySWQiOjUsImlhdCI6MTc3MjE0Nzc3MywiZXhwIjoxNzcyMTQ4MzczfQ.ae8XyO4CYjuNOw6kcfb_da5z9ru-2bRpgwUAbH75HEc
+
 GET {{baseUrl}}/users
 
 ###
@@ -28,7 +30,7 @@ Content-Type: application/json
 
 POST {{baseUrl}}/business
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkdBTUlORzE3MDciLCJ1c2VySWQiOjUsImlhdCI6MTc3MTE2OTExNSwiZXhwIjoxNzcxMTY5NzE1fQ.GOcdEwNJWNGHH1jlnfS8Mf8Cx07fNoqMvIHDTMFFGmw
+Authorization: Bearer {{token}}
 
 {
     "name": "Tech Innovators Inc.",
@@ -38,3 +40,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkdBT
     "primaryColor": "#FF5733",
     "secondaryColor": "#C70039"
 }
+
+###
+
+GET {{baseUrl}}/items/warehouses/1
+Authorization: Bearer {{token}}
+
+###
+
+GET {{baseUrl}}/business/companies/3/warehouses
+Authorization: Bearer {{token}}

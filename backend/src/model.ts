@@ -63,3 +63,19 @@ export type BusinessTypeRow = {
     ID: number,
     NAME: string
 }
+
+export type Product = {
+    id: number,
+    name: string,
+    imgUrl: string,
+    product_category: string,
+    unit: string
+}
+
+export type ProductRow = {
+    ID: number,
+    NAME: string,
+    IMG_URL: string,
+    PRODUCT_CATEGORY: string,
+    UNIT: string
+}

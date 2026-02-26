@@ -89,3 +89,25 @@ export type InventoryItemRow = ProductRow & {
     QUANTITY: number,
     COMPANY_ID: number
 }
+
+export type Warehouse = {
+    id: number,
+    companyId: number,
+    name: string,
+    latitude: number,
+    longitude: number,
+    country: string,
+    city: string,
+    capacity: number
+}
+
+export type WarehouseRow = {
+    ID: number,
+    COMPANY_ID: number
+    NAME: string,
+    LATITUDE: number,
+    LONGITUDE: number,
+    COUNTRY: string,
+    CITY: string,
+    CAPACITY_M3: number
+}

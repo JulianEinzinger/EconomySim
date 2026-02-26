@@ -18,5 +18,7 @@ app.use("/login", loginRouter);
 app.use("/locations", locationRouter);
 app.use("/business", businessRouter);
 
+app.use(express.static("resources"))
+
 app.listen(PORT, () => console.log(`Server listening on: http://localhost:${PORT}`)
 );

@@ -1,13 +1,40 @@
+const companyId = localStorage.getItem('current-company-id');
+
+
 const invBody = document.getElementById('inventory-body');
 
 let products = [];
 
-async function fetchAllAvailableProducts() {
-    const res = await fetch('http://localhost:3000/items');
+async function fetchItems() {
+    const token = localStorage.getItem('token');
 
-    if(res.ok) {
-        products = await res.json();
-        renderProducts();
+    const warehousesRes = await fetch(`http://localhost:3000/business/companies/${companyId}/warehouses`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    let warehouses = [];
+
+    if(warehousesRes.ok) {
+        warehouses = await warehousesRes.json();
+
+        if(warehouses.length == 0) return;
+
+        // get items
+        const warehouseId = warehouses[0].id;
+        const itemsRes = await fetch(`http://localhost:3000/items/warehouses/${warehouseId}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if(itemsRes.ok) {
+            products = await itemsRes.json();
+            renderProducts();
+        }
     }
 }
 
@@ -16,7 +43,7 @@ function renderProducts() {
 
     products.forEach(p => {
         const row = document.createElement('tr');
-        const quantity = Math.floor(Math.random() * 100) + 1; // Random quantity for demonstration
+        const quantity = p.quantity;
 
         const status = quantity > 10 ? 'OK' : quantity > 0 ? 'Low' : 'Empty';
 
@@ -34,4 +61,4 @@ function renderProducts() {
     });
 }
 
-await fetchAllAvailableProducts();
+await fetchItems();

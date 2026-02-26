@@ -79,3 +79,13 @@ export type ProductRow = {
     PRODUCT_CATEGORY: string,
     UNIT: string
 }
+
+export type InventoryItem = Product & {
+    quantity: number,
+    companyId: number
+}
+
+export type InventoryItemRow = ProductRow & {
+    QUANTITY: number,
+    COMPANY_ID: number
+}

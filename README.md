@@ -74,7 +74,7 @@ On arrival, the items get stored in the warehouse, which of course has limited s
 
 The warehouse capacity can be upgraded with money.
 
-The player can choose for each item in the warehouse wether to put it up for sale, or maybe just a specific amount and set its price(option to set it netto and brutto getting calculated and vice versa.
+The player can choose for each item in the warehouse wether to put it up for sale, or maybe just a specific amount and set its price(option to set it netto and brutto getting calculated and vice versa).
 
 ##### Page Layout <a name="retail-pages"/>
 ###### Dashboard-Page <a name="retail-dashboard"/>
@@ -83,7 +83,7 @@ Overview of number of sold Items in the last 24h, sales in the last 24h, profit 
 
 ###### Inventory-Page <a name="retail-inventory"/>
 
-Overview of the inventory, including it's current size(in m³?) and the items stored currently, and a possibility to ourchase more space.
+Overview of the inventory, including it's current size(in m³?) and the items stored currently, and a possibility to purchase more space.
 
 ###### Economics-Page <a name="retail-economics"/>
  

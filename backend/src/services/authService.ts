@@ -51,3 +51,14 @@ export const authenticateDev = (req: Request, res: Response, next: NextFunction)
         return res.sendStatus(StatusCodes.FORBIDDEN);
     }
 }
+
+/**
+     * creates a JWT token for the provided username
+     * @param username username to create the token for
+     * @returns jwt token as a string
+     */
+    export const createToken = (username: string, userId: number): string => {
+        // create token with JWT
+        const payload: TokenPayload = { username, userId };
+        return jwt.sign(payload, SECRET_KEY, { expiresIn: "10m" });
+    }

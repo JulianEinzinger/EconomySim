@@ -102,17 +102,7 @@ export class UserService {
         }
     }
 
-    /**
-     * creates a JWT token for the provided username
-     * @param username username to create the token for
-     * @returns jwt token as a string
-     */
-    createToken(username: string, userId: number): string {
-        // create token with JWT
-        const SECRET_KEY = "mySecretKey";
-        const payload: TokenPayload = { username, userId };
-        return jwt.sign(payload, SECRET_KEY, { expiresIn: "10m" });
-    }
+    
 
     /**
      * retrieves all companies owned by the user with the provided user ID

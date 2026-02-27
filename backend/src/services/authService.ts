@@ -15,6 +15,13 @@ export interface TokenPayload {
     userId: number;
 }
 
+/**
+ * Authenticates a JWT token from the Authorization header. If the token is valid, it attaches the user information to the request object and calls the next middleware. If the token is missing or invalid, it sends an appropriate HTTP status code.
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];

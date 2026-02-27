@@ -1,8 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
-const SECRET_KEY = "mySecretKey";
+// Load the secret key from environment variables and log an error if it's not set
+const SECRET_KEY: string = process.env.TOKEN_KEY || "";
+if (!SECRET_KEY) {
+    console.error("Error: TOKEN_KEY environment variable is not set.");
+}
 
 export interface TokenPayload {
     username: string;

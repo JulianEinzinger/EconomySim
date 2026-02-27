@@ -1,4 +1,5 @@
-import type { Connection } from "oracledb";
+import oracledb, { type Connection, type Result } from "oracledb";
+const { BIND_OUT, NUMBER } = oracledb;
 import { type InventoryItem, type InventoryItemRow, type Product, type ProductRow, type Warehouse, type WarehouseRow } from "../model.js";
 import { getDBConnection } from "../data.js";
 
@@ -38,7 +39,7 @@ export class ItemService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: InventoryItemRow[] = (await connection.execute<InventoryItemRow>("SELECT wi.*, p.*, pc.name AS PRODUCT_CATEGORY FROM warehouse_items wi JOIN products p ON wi.product_id = p.id JOIN product_categories pc ON p.product_category_id = pc.id WHERE wi.warehouse_id = :warehouseId", {
+            const result: InventoryItemRow[] = (await connection.execute<InventoryItemRow>("SELECT wi.*, p.*, pc.name AS PRODUCT_CATEGORY FROM warehouse_items wi JOIN products p ON wi.product_id = p.id JOIN product_categories pc ON p.product_category_id = pc.id WHERE wi.warehouse_id = :warehouseId ORDER BY p.name", {
                 warehouseId: warehouseId
             })).rows ?? [];
         

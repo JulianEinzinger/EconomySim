@@ -50,3 +50,16 @@ Authorization: Bearer {{token}}
 
 GET {{baseUrl}}/business/companies/3/warehouses
 Authorization: Bearer {{token}}
+
+###
+
+POST {{baseUrl}}/dev/products
+Content-Type: application/json
+Authorization: Bearer dev123
+
+{
+    "name": "Red Bull Tropical Einwegpfand 0.25L",
+    "imgUrl": "redbull_yellow.png",
+    "productCategoryId": 2,
+    "unit": "Stk"
+}

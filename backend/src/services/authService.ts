@@ -23,3 +23,25 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
         return res.sendStatus(StatusCodes.FORBIDDEN);
     }
 };
+
+const DEV_TOKEN = process.env.DEV_TOKEN;
+
+/**
+ * Authenticates a development token from the Authorization header. If the token matches the expected development token, it calls the next middleware. If the token is missing or does not match, it sends an appropriate HTTP status code.
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
+export const authenticateDev = (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers["authorization"];
+    const devToken = authHeader && authHeader.split(" ")[1];
+
+    if(!devToken) return res.sendStatus(StatusCodes.UNAUTHORIZED);
+
+    if(devToken === DEV_TOKEN) {
+        next();
+    } else {
+        return res.sendStatus(StatusCodes.FORBIDDEN);
+    }
+}

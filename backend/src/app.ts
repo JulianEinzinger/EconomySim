@@ -5,6 +5,7 @@ import { loginRouter } from "./router/loginRouter.js";
 import { locationRouter } from "./router/locationRouter.js";
 import { businessRouter } from "./router/businessRouter.js";
 import { itemRouter } from "./router/itemRouter.js";
+import { devRouter } from "./router/devRouter.js";
 
 
 const PORT = 3000;
@@ -19,6 +20,7 @@ app.use("/login", loginRouter);
 app.use("/locations", locationRouter);
 app.use("/business", businessRouter);
 app.use("/items", itemRouter);
+app.use("/dev", devRouter);
 
 app.use(express.static("resources"))
 

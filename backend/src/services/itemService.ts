@@ -89,4 +89,37 @@ export class ItemService {
             return null;
         }
     }
+
+    public async createNewProduct(name: string, imgUrl: string, productCategoryId: number, unit: string): Promise<[number, string]> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result: Result<{ id: number[] }> = (await connection.execute<{ id: number[] }>('INSERT INTO products (name, img_url, product_category_id, unit) VALUES (:name, :imgUrl, :productCategoryId, :unit) RETURNING id INTO :id', {
+                name: name,
+                imgUrl: imgUrl,
+                productCategoryId: productCategoryId,
+                unit: unit,
+                id: { dir: BIND_OUT, type: NUMBER }
+            }));
+        
+            await connection.commit();
+            await connection.close();
+
+            if(!result.outBinds) throw new Error("SQL Outbinds are empty!");
+
+            // fix any potential type issues with the outBinds
+            const productId: number | undefined = typeof result.outBinds.id[0] === 'number' ? result.outBinds.id[0] : -1;
+            console.log(productId);
+
+            if(productId <= 0) {
+                console.error(`Something happened while trying to create a new product. Invalid product id returned: ${productId}`);
+                return [-1, "An error occurred while trying to create a new product."];
+            }
+            
+            return [productId, "Product created successfully"];
+        } catch(err) {
+            console.error(`Something happened while trying to create w new product: ${err}`);
+            return [-1, `An error occurred while trying to create a new product: ${err}`];
+        }
+    }
 }

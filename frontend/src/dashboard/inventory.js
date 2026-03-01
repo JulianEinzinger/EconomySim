@@ -22,19 +22,8 @@ async function fetchItems() {
 
         if(warehouses.length == 0) return;
 
-        // get items
-        const warehouseId = warehouses[0].id;
-        const itemsRes = await fetch(`http://localhost:3000/items/warehouses/${warehouseId}`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        if(itemsRes.ok) {
-            products = await itemsRes.json();
-            renderProducts();
-        }
+        products = warehouses[0].items;
+        renderProducts();
     }
 }
 

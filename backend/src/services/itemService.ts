@@ -1,6 +1,6 @@
 import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER } = oracledb;
-import { type InventoryItem, type InventoryItemRow, type Product, type ProductRow, type Warehouse, type WarehouseRow } from "../model.js";
+import { type InventoryItem, type InventoryItemRow, type Product, type ProductRow, type Warehouse, type WarehouseRow, type WarehouseWithItemsRow } from "../model.js";
 import { getDBConnection } from "../data.js";
 
 export class ItemService {
@@ -66,30 +66,83 @@ export class ItemService {
      * @returns 
      */
     public async getWarehousesByCompanyId(companyId: number): Promise<Warehouse[] | null> {
-        try {
-            const connection: Connection = await getDBConnection();
+    try {
+        const connection = await getDBConnection();
 
-            const result: WarehouseRow[] = (await connection.execute<WarehouseRow>("SELECT w.*, l.city_name AS CITY, l.latitude, l.longitude, c.name AS COUNTRY FROM warehouses w JOIN locations l ON w.location_id = l.id JOIN countries c ON l.country_code = c.country_code WHERE w.company_id = :companyId", {
-                companyId: companyId
-            })).rows ?? [];
+        const rows = (await connection.execute<WarehouseWithItemsRow>(
+            `SELECT
+    w.id              AS W_ID,
+    w.company_id      AS W_COMPANY_ID,
+    w.name            AS W_NAME,
+    w.capacity_m3     AS W_CAPACITY,
 
-            await connection.close();
+    l.city_name       AS CITY,
+    l.latitude        AS LATITUDE,
+    l.longitude       AS LONGITUDE,
+    c.name            AS COUNTRY,
 
-            return result.map<Warehouse>(wr => ({
-                id: wr.ID,
-                companyId: wr.COMPANY_ID,
-                name: wr.NAME,
-                latitude: wr.LATITUDE,
-                longitude: wr.LONGITUDE,
-                city: wr.CITY,
-                country: wr.COUNTRY,
-                capacity: wr.CAPACITY_M3
-            }));
-        } catch(err) {
-            console.error(`Something happened while trying to retrieve Warehouses for company id: ${companyId}: ${err}`);
-            return null;
+    wi.product_id             AS WI_ID,
+    wi.quantity       AS QUANTITY,
+
+    p.id              AS P_ID,
+    p.name            AS P_NAME,
+    p.img_url         AS IMG_URL,
+    p.unit            AS UNIT,
+    pc.name           AS PRODUCT_CATEGORY
+
+FROM warehouses w
+JOIN locations l ON w.location_id = l.id
+JOIN countries c ON l.country_code = c.country_code
+
+LEFT JOIN warehouse_items wi ON wi.warehouse_id = w.id
+LEFT JOIN products p ON wi.product_id = p.id
+LEFT JOIN product_categories pc ON p.product_category_id = pc.id
+
+WHERE w.company_id = :companyId
+ORDER BY w.id, p.name`,
+            { companyId }
+        )).rows ?? [];
+
+        await connection.close();
+
+        const warehouseMap = new Map<number, Warehouse>();
+
+        for (const r of rows) {
+            // 🏭 Warehouse noch nicht vorhanden → anlegen
+            if (!warehouseMap.has(r.W_ID)) {
+                warehouseMap.set(r.W_ID, {
+                    id: r.W_ID,
+                    companyId: r.W_COMPANY_ID,
+                    name: r.W_NAME,
+                    latitude: r.LATITUDE,
+                    longitude: r.LONGITUDE,
+                    city: r.CITY,
+                    country: r.COUNTRY,
+                    capacity: r.W_CAPACITY,
+                    items: []
+                });
+            }
+
+            // 📦 Item vorhanden?
+            if (r.WI_ID && r.P_ID) {
+                warehouseMap.get(r.W_ID)!.items.push({
+                    id: r.WI_ID,
+                    name: r.P_NAME!,
+                    imgUrl: r.IMG_URL!,
+                    product_category: r.PRODUCT_CATEGORY!,
+                    unit: r.UNIT!,
+                    quantity: r.QUANTITY!,
+                    companyId: r.W_COMPANY_ID
+                });
+            }
         }
+
+        return [...warehouseMap.values()];
+    } catch (err) {
+        console.error(err);
+        return null;
     }
+}
 
     public async createNewProduct(name: string, imgUrl: string, productCategoryId: number, unit: string): Promise<[number, string]> {
         try {

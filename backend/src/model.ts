@@ -98,7 +98,8 @@ export type Warehouse = {
     longitude: number,
     country: string,
     city: string,
-    capacity: number
+    capacity: number;
+    items: InventoryItem[]
 }
 
 export type WarehouseRow = {
@@ -110,4 +111,24 @@ export type WarehouseRow = {
     COUNTRY: string,
     CITY: string,
     CAPACITY_M3: number
+}
+
+export type WarehouseWithItemsRow = {
+    W_ID: number;
+    W_COMPANY_ID: number;
+    W_NAME: string;
+    W_CAPACITY: number;
+    CITY: string;
+    LATITUDE: number;
+    LONGITUDE: number;
+    COUNTRY: string;
+
+    WI_ID: number | null;
+    QUANTITY: number | null;
+
+    P_ID: number | null;
+    P_NAME: string | null;
+    IMG_URL: string | null;
+    UNIT: string | null;
+    PRODUCT_CATEGORY: string | null;
 }

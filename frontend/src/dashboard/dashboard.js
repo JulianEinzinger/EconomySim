@@ -1,3 +1,7 @@
+import { Utils } from "../utils.js";
+
+await Utils.checkAuth();
+
 // Sidebar toggle
 
 var sidebarOpen = false;

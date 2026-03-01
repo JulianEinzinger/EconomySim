@@ -1,3 +1,7 @@
+import { Utils } from "../utils.js";
+
+await Utils.checkAuth();
+
 const companyId = localStorage.getItem('current-company-id');
 
 

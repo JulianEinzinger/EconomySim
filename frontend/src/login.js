@@ -7,6 +7,8 @@ loginBtn.addEventListener('click', async (e) => {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
+    const errorText = document.getElementById('login-error-text');
+
     try {
         const response = await fetch("http://localhost:3000/login", {
             method: 'POST',
@@ -26,10 +28,12 @@ loginBtn.addEventListener('click', async (e) => {
         } else {
             // login failed
             const errorMsg = (await response.json()).message;
-            document.getElementById('login-error-text').textContent = errorMsg;
+            errorText.textContent = errorMsg;
         }
         
     } catch(e) {
         console.error('Error:', e);
+        errorText.textContent =
+            'Server nicht erreichbar.';
     }
 });

@@ -4,6 +4,7 @@
 1. [Pages](#pages)
 2. [Game Design Ideas](#game-design-ideas)
     1. [Company-Slot Price Formula](#company-slot-price-scaling-formula)
+    2. [Money System](#money-system)
     2. [Business Types](#business-types)
        1. [Retail](#retail)
           1. [Page Layout](#retail-pages)
@@ -59,6 +60,10 @@ SlotCost(n) = Basecost * (Growthfactor ^{n-2}) * (1 + Assets / 1.000.000)
 
 Basecost = 10.000 <br>
 Growthfactor = 1.85
+
+### Money System
+
+The money system works as follows: The player has a general banc account, and each company also has an account on its own. If, for example, the company has bills to pay, or wants to purchase products, this has to be done by the company's bank account. The player can transfer money from the company's bank account to their personal bank account and vice versa at any time.
 
 ### Business Types
 

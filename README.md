@@ -105,6 +105,8 @@ After selecting a wholesaler, the player is presented with an overview of all av
 
 The player can add or remove products from the shopping cart and sees the **current total price updated in real time.**
 
+Upon buying, the player can choose whether to pay right now or to purchase on target.
+
 Improvement ideas:
 
 - Implement delivery time based on the wholesaler's location and the player's company.

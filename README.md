@@ -5,13 +5,15 @@
 2. [Game Design Ideas](#game-design-ideas)
     1. [Company-Slot Price Formula](#company-slot-price-scaling-formula)
     2. [Money System](#money-system)
-    2. [Business Types](#business-types)
+    3. [Business Types](#business-types)
        1. [Retail](#retail)
           1. [Page Layout](#retail-pages)
              1. [Dashboard](#retail-dashboard)
              2. [Inventory](#retail-inventory)
              3. [Economics](#retail-economics)
              4. [Purchase](#retail-purchase)
+             5. [Orders](#orders-page)
+             6. [Mail](#mail-page)
 
 
 ## Pages
@@ -112,3 +114,11 @@ Improvement ideas:
 - Implement delivery time based on the wholesaler's location and the player's company.
 - Add shipping costs that scale with distance and order volume.
 - VAT handling, including reclaiming input tax from the tax office.
+
+###### Orders-Page
+
+On the Orders Page, the player is confronted with an overview of all open orders, including all products in the specific order, its total and whether it has been payed off already, and if not, on what date it is due.
+
+###### Mail-Page
+
+Access to mails, e.g. a payment reminder from a wholesaler or mails from the bank.

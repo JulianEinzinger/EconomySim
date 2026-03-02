@@ -49,8 +49,19 @@ export class CompanyService {
             try {
                 const connection: Connection = await getDBConnection();
 
+                // create bank account
+                const bankAccountResult: Result<{ id: number[] }> = await connection.execute<{ id: number[] }>(`INSERT INTO bank_accounts (balance) VALUES (DEFAULT) RETURNING id INTO :id`, ({
+                    id: { dir: BIND_OUT, type: NUMBER }
+                }));
+
+                if(!bankAccountResult.outBinds) throw new Error("Bank-Account-Creation: SQL Outbinds are empty!");
+
+                const bankAccountId = bankAccountResult.outBinds.id[0];
+
+                if(!bankAccountId) throw new Error("Failed to retrieve bank account ID from database!");
+
                 const result: Result<{ id: number[] }> = await connection.execute<{ id: number[] }>(`INSERT INTO companies (name, ownerid, location_id , business_type_id, 
-                    primary_color, secondary_color) VALUES (:name, :ownerid, :locationId, :businessTypeId, :primaryColor, :secondaryColor)
+                    primary_color, secondary_color, bank_account_id) VALUES (:name, :ownerid, :locationId, :businessTypeId, :primaryColor, :secondaryColor, :bankAccountId)
                     RETURNING id INTO :id`, ({
                         name: name,
                         ownerid: userId,
@@ -58,6 +69,7 @@ export class CompanyService {
                         businessTypeId: businessTypeId,
                         primaryColor: primaryColor,
                         secondaryColor: secondaryColor,
+                        bankAccountId: bankAccountId,
                         id: { dir: BIND_OUT, type: NUMBER }
                     }));
 
@@ -65,7 +77,7 @@ export class CompanyService {
 
                 const companyId = result.outBinds.id[0];
 
-                if(!companyId) throw new Error("Failed to retrieve company ID from database!");
+                if(!companyId) throw new Error("Failed to retrieve company ID from database!");                
 
                 await connection.commit();
                 await connection.close();
@@ -121,7 +133,7 @@ export class CompanyService {
 
             const connection: Connection = await getDBConnection();
 
-            const rows: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT * FROM companies WHERE id = :companyId", {
+            const rows: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT c.id, c.name, c.ownerid, c.business_type_id, b.balance FROM companies c LEFT JOIN bank_accounts b ON c.bank_account_id = b.id WHERE c.id = :companyId", {
                 companyId: companyId
             })).rows ?? [];
 
@@ -130,12 +142,13 @@ export class CompanyService {
             if(rows.length === 0 || !rows[0]) return null;
 
             const row: CompanyRow = rows[0];
-
+            
             return ({
                 id: row.ID,
                 name: row.NAME,
-                ownerId: row.OWNER_ID,
-                businessTypeId: row.BUSINESS_TYPE_ID
+                ownerId: row.OWNERID,
+                businessTypeId: row.BUSINESS_TYPE_ID,
+                balance: row.BALANCE
             });
         } catch(err) {
             console.error(`Error fetching company by ID for user: ${err}`);

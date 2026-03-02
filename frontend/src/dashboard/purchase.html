@@ -11,7 +11,11 @@
     <!-- Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
-    <link rel="stylesheet" href="inventory.css">
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+    <link rel="stylesheet" href="purchase.css">
 </head>
 <body>
     <div class="grid-container">
@@ -81,34 +85,17 @@
         </aside>
 
         <main class="main-container">
-    <div class="main-title">
-        <p class="font-weight-bold">INVENTORY</p>
-        <button class="btn-secondary">
-            <span class="material-icons-outlined">filter_list</span>
-            Filter
-        </button>
+            <div class="main-title">
+                <p class="font-weight-bold">PURCHASE</p>
+            </div>
+        </main>
     </div>
 
-    <div class="inventory-table-wrapper">
-        <table class="inventory-table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Category</th>
-                    <th>Quantity</th>
-                    <th>Unit</th>
-                    <th>Status</th>
-                    <th>Location</th>
-                </tr>
-            </thead>
-            <tbody id="inventory-body">
-            </tbody>
-        </table>
-    </div>
-</main>
-    </div>
-
-    <script src="inventory.js" type="module"></script>
+    <script src="purchase.js" type="module"></script>
     <script src="sidebar.js" type="module"></script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
 </body>
 </html>

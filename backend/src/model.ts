@@ -14,15 +14,17 @@ export type Company = {
     id: number,
     name: string,
     ownerId: number,
-    businessTypeId: number
+    businessTypeId: number,
+    balance: number
 }
 
 export type CompanyRow = {
     ID: number,
     NAME: string,
-    OWNER_ID: number,
+    OWNERID: number,
     BUSINESS_TYPE_ID: number,
-    BUSINESS_TYPE_NAME: string
+    BUSINESS_TYPE_NAME: string,
+    BALANCE: number
 }
 
 /**

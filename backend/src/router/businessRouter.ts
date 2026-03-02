@@ -22,13 +22,13 @@ businessRouter.get("/businessTypes", async (req: Request, res: Response) => {
 
 businessRouter.post("/", authenticateToken, async (req: Request, res: Response) => {
     const b = req.body;
-    const [name, businessTypeId, countryCode, cityName, primColor, secColor]: [string, number, string, string, string, string] = 
-            [req.body.name, b.businessTypeId, b.countryCode, b.city, b.primaryColor, b.secondaryColor];
+    const [name, businessTypeId, locationId, primColor, secColor]: [string, number, number, string, string] = 
+            [req.body.name, b.businessTypeId, b.locationId, b.primaryColor, b.secondaryColor];
     const userId: number = req.user!.userId;
 
     const service: CompanyService = new CompanyService();
 
-    const [companyId, msg]: [number, string] = await service.foundNewCompany(userId, name, businessTypeId, countryCode, cityName, primColor, secColor);
+    const [companyId, msg]: [number, string] = await service.foundNewCompany(userId, name, businessTypeId, locationId, primColor, secColor);
 
     if(companyId == -1) {
         res.status(StatusCodes.BAD_REQUEST).json({ message: msg });

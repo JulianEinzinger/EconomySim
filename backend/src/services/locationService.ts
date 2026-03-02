@@ -1,6 +1,6 @@
 import type { Connection } from "oracledb";
 import { getDBConnection } from "../data.js";
-import type { City, CityRow, Country, CountryRow } from "../model.js";
+import type { City, CityRow, Country, CountryRow, Location, LocationRow } from "../model.js";
 
 export class LocationService {
 
@@ -40,10 +40,38 @@ export class LocationService {
 
             return result.map<City>(cr => ({
                 name: cr.NAME,
-                countryCode: cr.COUNTRY_CODE
+                countryCode: cr.COUNTRY_CODE,
+                latitude: cr.LATITUDE,
+                longitude: cr.LONGITUDE
             }));
         } catch(err) {
             console.error(`Something happened while trying to retrieve cities from database: ${err}`);
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves all free locations from the database.
+     * @returns a list of locations, or null if an error occurs.
+     */
+    public async getFreeLocations(): Promise<Location[] | null> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result: LocationRow[] = (await connection.execute<LocationRow>("SELECT l.id, l.name, l.latitude, l.longitude, l.city_name, l.country_code FROM companies c RIGHT JOIN locations l on c.location_id = l.id WHERE c.name IS NULL")).rows ?? [];
+
+            await connection.close();
+
+            return result.map<Location>(lr => ({
+                id: lr.ID,
+                name: lr.NAME,
+                latitude: lr.LATITUDE,
+                longitude: lr.LONGITUDE,
+                cityName: lr.CITY_NAME,
+                countryCode: lr.COUNTRY_CODE
+            }));
+        } catch(err) {
+            console.error(`Something happened while trying to retrieve free locations from database: ${err}`);
             return null;
         }
     }

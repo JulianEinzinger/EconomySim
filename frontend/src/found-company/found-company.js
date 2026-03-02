@@ -9,6 +9,7 @@ const previewName = document.getElementById("preview-name");
 const previewBusiness = document.getElementById("preview-business");
 const previewCountry = document.getElementById("preview-country");
 const previewCity = document.getElementById("preview-city");
+const previewLocation = document.getElementById("preview-location");
 
 const feesDisplay = document.getElementById("fees-display");
 
@@ -25,12 +26,24 @@ function updatePreview() {
 
     previewCity.textContent =
         citySelect.options[citySelect.selectedIndex]?.text || "–";
+
+    previewLocation.textContent =
+        selectedLocation?.name || "-";
 }
 
 // Event Listener
 nameInput.addEventListener("input", updatePreview);
 businessSelect.addEventListener("change", updatePreview);
-citySelect.addEventListener("change", updatePreview);
+citySelect.addEventListener("change", () => {
+    selectedLocation = null;
+    updateMapView();
+    updatePreview();
+});
+countrySelect.addEventListener("change", () => {
+    selectedLocation = null;
+    updateCityOptions();
+    updateMapView();
+});
 
 
 const primaryColorInput = document.getElementById("primary-color");
@@ -128,7 +141,7 @@ function updateCityOptions() {
         cities.get(selectedCountry).forEach(city => {
             const option = document.createElement("option");
             option.text = city.name;
-            option.value = `${city.name};${city.countryCode}`;
+            option.value = `${city.name};${city.countryCode};${city.latitude}-${city.longitude}`;
 
             citySelect.appendChild(option);
         });
@@ -173,6 +186,8 @@ async function loadCompanyPrice() {
 companyForm.addEventListener("submit", async (e) => {
     e.preventDefault(); // verhindert Page-Reload
 
+    if(!selectedLocation) return;
+
     const token = localStorage.getItem('token');
 
     const payload = {
@@ -181,7 +196,8 @@ companyForm.addEventListener("submit", async (e) => {
         countryCode: countrySelect.value,
         city: citySelect.value.split(';')[0],
         primaryColor: primaryColorInput.value,
-        secondaryColor: secondaryColorInput.value
+        secondaryColor: secondaryColorInput.value,
+        locationId: selectedLocation.id
     };
 
     console.log(payload);
@@ -204,6 +220,72 @@ companyForm.addEventListener("submit", async (e) => {
     }
 });
 
+
+let selectedLocation = null;
+function updateMapView() {
+    const selectedCity = citySelect.value
+    .split(';')[0] + ';' + citySelect.value
+    .split(';')[1];
+
+    console.clear();
+    console.log(selectedCity);
+    
+
+    freeLocations.keys().forEach(k => {
+        console.log(`Checking ${k}...`)
+        if(k === selectedCity) {
+            freeLocations.get(k).forEach(loc => {
+                L.marker([loc.longitude, loc.latitude]).addTo(map)
+                    .bindPopup(loc.name)
+                    .on('click', e => {
+                        selectedLocation = {
+                            id: loc.id,
+                            name: loc.name
+                        }
+
+                        const locationId = loc.id;
+                        previewLocation.textContent = loc.name;
+                    });
+            })
+            
+        }
+    });
+
+    const selectedCityCoordinates = citySelect.value.split(';')[2].split('-');
+    map.setView(selectedCityCoordinates, 13);
+}
+
+const freeLocations = new Map();
+
+async function loadFreeLocations() {
+    const locationsResult = await fetch("http://localhost:3000/locations/free");
+
+    if(locationsResult.ok) {
+        const locs = await locationsResult.json();
+
+        locs.forEach(l => {
+            const key = `${l.cityName};${l.countryCode}`;
+
+            if(!freeLocations.has(key)) {
+                freeLocations.set(key, []);
+            }
+            freeLocations.get(key).push(l);
+        });
+        
+    }
+}
+
+let map;
+
+function initMap() {
+    map = L.map('map').setView([48.307, 14.286], 13); // Default Linz
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+}
+
+
 await Utils.checkAuth();
 
 await loadCountries();
@@ -211,6 +293,8 @@ await loadCities();
 await loadBusinessTypes();
 await loadCompanyPrice();
 
-updateCityOptions();
+initMap();
+await loadFreeLocations();
 
-countrySelect.addEventListener("change", updateCityOptions);
+updateCityOptions();
+updateMapView();

@@ -26,7 +26,7 @@ export class CompanyService {
      * @returns the company-id of the new company, or -1 if failed, and a message describing the result
      */
     public async foundNewCompany(userId: number, name: string, businessTypeId: number, 
-        countryCode: string, cityName: string, primaryColor: string, secondaryColor: string): Promise<[number, string]> {
+        locationId: number, primaryColor: string, secondaryColor: string): Promise<[number, string]> {
             const userService: UserService = new UserService();
 
             const balance: number = await userService.getUserBalance(userId);
@@ -34,7 +34,7 @@ export class CompanyService {
 
             if(balance < nextPrice) return [-1, "Balance not sufficient!"];
 
-            const [companyId, msg]: [number, string] = await this.createNewCompany(userId, name, businessTypeId, countryCode, cityName, primaryColor, secondaryColor);
+            const [companyId, msg]: [number, string] = await this.createNewCompany(userId, name, businessTypeId, locationId, primaryColor, secondaryColor);
             return [companyId, msg];
         }
 
@@ -42,20 +42,19 @@ export class CompanyService {
      * @returns company-id of the new company, or -1 if failed
      */
     private async createNewCompany(userId: number, name: string, businessTypeId: number, 
-        countryCode: string, cityName: string, primaryColor: string, secondaryColor: string): Promise<[number, string]> {
-            console.log(`Params: ${userId}, ${name}, ${businessTypeId}, ${countryCode}, ${cityName}, ${primaryColor}, ${secondaryColor}`);
+        locationId: number, primaryColor: string, secondaryColor: string): Promise<[number, string]> {
+            console.log(`Params: ${userId}, ${name}, ${businessTypeId}, ${locationId}, ${primaryColor}, ${secondaryColor}`);
             
 
             try {
                 const connection: Connection = await getDBConnection();
 
-                const result: Result<{ id: number[] }> = await connection.execute<{ id: number[] }>(`INSERT INTO companies (name, ownerid, country_code, city_name, business_type_id, 
-                    primary_color, secondary_color) VALUES (:name, :ownerid, :countryCode, :cityname, :businessTypeId, :primaryColor, :secondaryColor)
+                const result: Result<{ id: number[] }> = await connection.execute<{ id: number[] }>(`INSERT INTO companies (name, ownerid, location_id , business_type_id, 
+                    primary_color, secondary_color) VALUES (:name, :ownerid, :locationId, :businessTypeId, :primaryColor, :secondaryColor)
                     RETURNING id INTO :id`, ({
                         name: name,
                         ownerid: userId,
-                        countryCode: countryCode,
-                        cityName: cityName,
+                        locationId: locationId,
                         businessTypeId: businessTypeId,
                         primaryColor: primaryColor,
                         secondaryColor: secondaryColor,

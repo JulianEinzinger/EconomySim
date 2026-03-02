@@ -46,12 +46,16 @@ export type CountryRow = {
 
 export type City = {
     name: string,
-    countryCode: string
+    countryCode: string,
+    latitude: number,
+    longitude: number
 }
 
 export type CityRow = {
     NAME: string,
-    COUNTRY_CODE: string
+    COUNTRY_CODE: string,
+    LATITUDE: number,
+    LONGITUDE: number
 }
 
 export type BusinessType = {
@@ -131,4 +135,21 @@ export type WarehouseWithItemsRow = {
     IMG_URL: string | null;
     UNIT: string | null;
     PRODUCT_CATEGORY: string | null;
+}
+
+export type Location = {
+    id: number,
+    name: string,
+    latitude: number,
+    longitude: number,
+    cityName: string,
+    countryCode: string
+}
+export type LocationRow = {
+    ID: number,
+    NAME: string,
+    LATITUDE: number,
+    LONGITUDE: number,
+    CITY_NAME: string,
+    COUNTRY_CODE: string
 }

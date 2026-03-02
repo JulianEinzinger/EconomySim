@@ -203,3 +203,28 @@ input[type="color"] {
 #fees-display {
     color: rgb(46, 88, 48);
 }
+
+/* ===== Leaflet Map ===== */
+
+#map-container {
+    margin-top: 10px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+}
+
+#map-container:hover {
+    transform: scale(1.01);
+}
+
+#map {
+    height: 320px;
+    width: 100%;
+}
+
+/* Darken map slightly for premium feel */
+.leaflet-container {
+    font-family: "Inter", sans-serif;
+    border-radius: 18px;
+}

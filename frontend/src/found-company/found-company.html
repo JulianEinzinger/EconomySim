@@ -6,6 +6,13 @@
 
     <link rel="stylesheet" href="found-company.css" />
 
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" ></script>
+
+
     <title>Found Company</title>
   </head>
   <body>
@@ -37,6 +44,11 @@
             required
           > </select>
 
+          <label>Choose Business Location:</label>
+          <div id="map-container">
+            <div id="map"></div>
+          </div>
+
           <label for="primary-color">Primary Accent Color:</label>
           <input type="color" id="primary-color" value="#3b82f6">
 
@@ -57,6 +69,7 @@
         <p><strong>Business:</strong> <span id="preview-business">–</span></p>
         <p><strong>Country:</strong> <span id="preview-country">–</span></p>
         <p><strong>City:</strong> <span id="preview-city">–</span></p>
+        <p><strong>Location:</strong> <span id="preview-location">-</span></p>
     </div>
 </div>
 

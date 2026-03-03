@@ -1,5 +1,5 @@
 import type { Connection } from "oracledb";
-import type { BusinessType, BusinessTypeRow } from "../model.js";
+import type { BusinessType, BusinessTypeRow } from "@economysim/shared";
 import { getDBConnection } from "../data.js";
 
 export class BusinessService {

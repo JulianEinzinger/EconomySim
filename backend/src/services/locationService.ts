@@ -1,6 +1,6 @@
 import type { Connection } from "oracledb";
 import { getDBConnection } from "../data.js";
-import type { City, CityRow, Country, CountryRow, Location, LocationRow } from "../model.js";
+import type { City, CityRow, Country, CountryRow, Location, LocationRow } from "@economysim/shared";
 
 export class LocationService {
 

@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { UserService } from "../services/userService.js";
-import type { User } from "../model.js";
+import type { User } from "@economysim/shared";
 import { StatusCodes } from "http-status-codes";
 import { authenticateToken } from "../services/authService.js";
 import { CompanyService } from "../services/companyService.js";

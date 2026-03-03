@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { BusinessService } from "../services/businessService.js";
-import type { BusinessType, Company, Warehouse } from "../model.js";
+import type { BusinessType, Warehouse } from "@economysim/shared";
 import { StatusCodes } from "http-status-codes";
 import { authenticateToken } from "../services/authService.js";
 import { CompanyService } from "../services/companyService.js";

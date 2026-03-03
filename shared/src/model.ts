@@ -155,3 +155,42 @@ export type LocationRow = {
     CITY_NAME: string,
     COUNTRY_CODE: string
 }
+
+export type Wholesaler = {
+    id: number,
+    name: string,
+    location: {
+        latitude: number,
+        longitude: number,
+        cityName: string,
+        countryName: string
+    },
+    products: WholesalerProduct[]
+}
+
+export type WholesalerRow = {
+    W_ID: number,
+    W_NAME: string,
+    LATITUDE: number,
+    LONGITUDE: number,
+    CITY_NAME: string,
+    COUNTRY_NAME: string,
+
+    PRODUCT_ID: number,
+    PRICE: number,
+    STOCK_QUANTITY: number,
+    ORDER_UNIT: number,
+    MAX_ORDER_STACKS: number,
+
+    P_NAME: string,
+    IMG_URL: string,
+    P_UNIT: string,
+    P_CATEGORY: string
+}
+
+export type WholesalerProduct = Product & {
+    price: number,
+    stock_quantity: number,
+    order_unit: number,
+    max_order_stacks: number
+}

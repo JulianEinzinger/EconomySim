@@ -1,6 +1,6 @@
 import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER } = oracledb;
-import { type InventoryItem, type InventoryItemRow, type Product, type ProductRow, type Warehouse, type WarehouseRow, type WarehouseWithItemsRow } from "../model.js";
+import { type InventoryItem, type InventoryItemRow, type Product, type ProductRow, type Warehouse, type WarehouseRow, type WarehouseWithItemsRow } from "@economysim/shared";
 import { getDBConnection } from "../data.js";
 
 export class ItemService {

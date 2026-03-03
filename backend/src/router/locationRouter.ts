@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { LocationService } from "../services/locationService.js";
-import type { City, Country, Location } from "../model.js";
+import type { City, Country, Location } from "@economysim/shared";
 import { StatusCodes } from "http-status-codes";
 
 export const locationRouter = Router();

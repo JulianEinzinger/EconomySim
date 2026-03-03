@@ -1,7 +1,7 @@
 import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER } = oracledb;
 import { getDBConnection } from "../data.js";
-import type { Company, CompanyDTO, CompanyRow, User, UserRow } from "../model.js";
+import type { Company, CompanyDTO, CompanyRow, User, UserRow } from "@economysim/shared";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import type { TokenPayload } from "./authService.js";

@@ -2,7 +2,7 @@ import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER } = oracledb
 import { getDBConnection } from "../data.js";
 import { UserService } from "./userService.js";
-import type { Company, CompanyRow } from "../model.js";
+import type { Company, CompanyRow } from "@economysim/shared";
 
 export class CompanyService {
     public async calculateNextPrice(companyCount: number): Promise<number> {

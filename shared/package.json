@@ -1,0 +1,13 @@
+{
+    "name": "@economysim/shared",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "dependencies": {
+        "typescript": "^5.9.3"
+    }
+}

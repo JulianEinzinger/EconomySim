@@ -12,9 +12,9 @@ export class WholesalerSevice {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: WholesalerRow[] = (await connection.execute<WholesalerRow>(`SELECT w.id AS W_ID, w.name AS W_NAME, l.latitude, l.longitude, 
-                l.city_name, c.name as country_name, wp.PRODUCT_ID, wp.price, wp.STOCK_QUANTITY,
-       wp.ORDER_UNIT, wp.MAX_ORDER_STACKS, p.NAME AS p_name, p.IMG_URL, p.UNIT AS p_unit, pc.NAME AS p_category, pc.img_url as category_img_url
+            const result: WholesalerRow[] = (await connection.execute<WholesalerRow>(`SELECT w.id AS W_ID, w.name AS W_NAME, l.latitude, 
+                w.logo_url AS W_LOGO_URL, l.longitude, l.city_name, c.name as country_name, wp.PRODUCT_ID, wp.price, wp.STOCK_QUANTITY,
+                wp.ORDER_UNIT, wp.MAX_ORDER_STACKS, p.NAME AS p_name, p.IMG_URL, p.UNIT AS p_unit, pc.NAME AS p_category, pc.img_url as category_img_url
 FROM wholesalers w
     JOIN locations l ON w.location_id = l.id
     JOIN countries c ON l.country_code = c.country_code
@@ -31,6 +31,7 @@ FROM wholesalers w
                     wholesalers.set(wr.W_ID, ({
                         id: wr.W_ID,
                         name: wr.W_NAME,
+                        logoUrl: wr.W_LOGO_URL,
                         location: {
                             latitude: wr.LATITUDE,
                             longitude: wr.LONGITUDE,

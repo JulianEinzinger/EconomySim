@@ -159,6 +159,7 @@ export type LocationRow = {
 export type Wholesaler = {
     id: number,
     name: string,
+    logoUrl: string,
     location: {
         latitude: number,
         longitude: number,
@@ -171,6 +172,7 @@ export type Wholesaler = {
 export type WholesalerRow = {
     W_ID: number,
     W_NAME: string,
+    W_LOGO_URL: string,
     LATITUDE: number,
     LONGITUDE: number,
     CITY_NAME: string,

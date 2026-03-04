@@ -67,5 +67,5 @@ export const authenticateDev = (req: Request, res: Response, next: NextFunction)
     export const createToken = (username: string, userId: number): string => {
         // create token with JWT
         const payload: TokenPayload = { username, userId };
-        return jwt.sign(payload, SECRET_KEY, { expiresIn: "10m" });
+        return jwt.sign(payload, SECRET_KEY, { expiresIn: "60m" });
     }

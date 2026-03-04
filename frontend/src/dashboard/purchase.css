@@ -99,8 +99,8 @@ a {
 
 .main-title {
     display: flex;
-    justify-content: space-between;
-    margin-right: 40%;
+    gap: 2rem;
+    align-items: center;
 }
 
 .main-title > p {
@@ -116,4 +116,67 @@ a {
     color: #e9cd2d;
     font-weight: bold;
     margin-bottom: 30px;
+}
+
+/* ----- CARDS ----- */
+.main-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 25px;
+    background-color: white;
+    box-sizing: border-box;
+    border: 1px solid #d2d2d3;
+    border-radius: 5px;
+    box-shadow: 0 6px 7px -4px rgba(0, 0, 0, 0.2);
+    align-items: center;
+}
+
+.card > span {
+    font-size: 25px;
+}
+
+.card > img {
+    height: 128px;
+}
+
+.card {
+    transition: 
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 12px 20px -6px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+}
+
+.card:hover span {
+    background: linear-gradient(to right, #e9cd2d, rgb(236, 121, 13));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent
+}
+
+#back-button {
+    border-radius: .6rem;
+    background-color: #21232d;
+    color: whitesmoke;
+    font-weight: bold;
+    font-size: 90%;
+    width: 5%;
+    height: 2rem;
+}
+
+#back-button:hover {
+    background-color: #4d4f57;
+    cursor: pointer;
 }

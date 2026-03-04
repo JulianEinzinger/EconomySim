@@ -58,7 +58,7 @@ export class LocationService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: LocationRow[] = (await connection.execute<LocationRow>("SELECT l.id, l.name, l.latitude, l.longitude, l.city_name, l.country_code FROM companies c RIGHT JOIN locations l on c.location_id = l.id WHERE c.name IS NULL")).rows ?? [];
+            const result: LocationRow[] = (await connection.execute<LocationRow>("SELECT l.id, l.name, l.latitude, l.longitude, l.city_name, l.country_code FROM locations l WHERE NOT EXISTS (SELECT 1 FROM companies c WHERE c.location_id = l.id) AND NOT EXISTS (SELECT 1 FROM wholesalers w WHERE w.location_id = l.id)")).rows ?? [];
 
             await connection.close();
 

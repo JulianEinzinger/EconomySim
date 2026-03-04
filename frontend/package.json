@@ -4,13 +4,18 @@
   "description": "",
   "license": "MIT",
   "author": "Julian Einzinger",
-  "type": "commonjs",
+  "type": "module",
   "main": "login.html",
   "scripts": {
-    "start": "vite src --port 3800"
+    "start": "vite src --port 3800",
+    "dev": "concurrently \"tsc --watch\" \"vite src --port 3800\""
   },
   "dependencies": {
     "@economysim/shared": "file:../shared",
     "vite": "^7.3.1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "typescript": "^5.9.3"
   }
 }

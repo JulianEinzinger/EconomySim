@@ -185,12 +185,15 @@ export type WholesalerRow = {
     P_NAME: string,
     IMG_URL: string,
     P_UNIT: string,
-    P_CATEGORY: string
+    P_CATEGORY: string,
+
+    CATEGORY_IMG_URL: string
 }
 
 export type WholesalerProduct = Product & {
     price: number,
     stock_quantity: number,
     order_unit: number,
-    max_order_stacks: number
+    max_order_stacks: number,
+    category_img_url: string
 }

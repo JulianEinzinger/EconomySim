@@ -6,6 +6,7 @@ import { locationRouter } from "./router/locationRouter.js";
 import { businessRouter } from "./router/businessRouter.js";
 import { itemRouter } from "./router/itemRouter.js";
 import { devRouter } from "./router/devRouter.js";
+import { wholesalerRouter } from "./router/wholesalerRouter.js";
 
 
 const PORT = 3000;
@@ -21,6 +22,7 @@ app.use("/locations", locationRouter);
 app.use("/business", businessRouter);
 app.use("/items", itemRouter);
 app.use("/dev", devRouter);
+app.use("/wholesalers", wholesalerRouter);
 
 app.use(express.static("resources"))
 

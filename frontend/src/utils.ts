@@ -11,11 +11,18 @@ export class Utils {
         });
 
         if(!result.ok) {
+            this.resetUserSpecificSessionStorage();
+
             // send user back to login if not authenticated
             window.location.href = '/index.html'
         } else {
             const userData = await result.json();
             console.log(`${userData.username} logged in.`)
         }
+    }
+
+    static resetUserSpecificSessionStorage() {
+        // delete user specific session storage
+        sessionStorage.removeItem('carts');
     }
 }

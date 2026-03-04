@@ -1,3 +1,5 @@
+import { Utils } from './utils.js';
+
 const loginBtn = document.getElementById('login-btn');
 
 loginBtn.addEventListener('click', async (e) => {
@@ -23,6 +25,7 @@ loginBtn.addEventListener('click', async (e) => {
 
             // Redirect to company overview page with token
             localStorage.setItem('token', data.token); // Store token in localStorage
+            Utils.resetUserSpecificSessionStorage();
             
             window.location.href = `company-overview/company-overview.html`;
         } else {

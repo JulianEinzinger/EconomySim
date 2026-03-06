@@ -311,6 +311,7 @@ function checkoutWholesaler(wholesalerId: number) {
     console.log('ORDER →', order);
     
     carts.delete(wholesalerId);
+    saveCartsToSessionStorage();
     renderCarts();
 }
 

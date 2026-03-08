@@ -8,7 +8,7 @@
   "main": "login.html",
   "scripts": {
     "start": "vite src --port 3800",
-    "dev": "concurrently \"tsc --watch\" \"vite src --port 3800\""
+    "dev": "concurrently \"tsc --watch\" \"vite src --port 3800 --config vite.config.js\""
   },
   "dependencies": {
     "@economysim/shared": "file:../shared",

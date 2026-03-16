@@ -64,4 +64,13 @@ FROM wholesalers w
             return null;
         }
     }
+
+    async purchaseFromWholesaler(wholesalerId: number, items: { productId: number, quantity: number }[]): Promise<boolean> {
+        try {
+            return true;
+        } catch(err) {
+            console.error(`Something happened while trying to make a purchase: ${err}`);
+            return false;
+        }
+    }
 }

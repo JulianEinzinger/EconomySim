@@ -16,3 +16,17 @@ wholesalerRouter.get("/", async (req: Request, res: Response) => {
         res.status(StatusCodes.OK).json(wholesalers);
     }
 });
+
+wholesalerRouter.post("/purchase", async (req: Request, res: Response) => {
+    const [wholesalerId, items]: [ number, { productId: number, quantity: number }[]] = req.body;
+
+    const service: WholesalerSevice = new WholesalerSevice();
+    
+    const success: boolean = await service.purchaseFromWholesaler(wholesalerId, items);
+
+    if(success) {
+        res.status(StatusCodes.OK).json({ message: 'Purchase successful' });
+    } else {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error processing purchase' });
+    }
+});

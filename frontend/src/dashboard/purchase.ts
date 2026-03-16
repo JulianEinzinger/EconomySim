@@ -303,8 +303,7 @@ function checkoutWholesaler(wholesalerId: number) {
         wholesalerId,
         items: Array.from(cart.items.values()).map(ci => ({
             productId: ci.product.id,
-            quantity: ci.quantity,
-            price: ci.product.price
+            quantity: ci.quantity
         }))
     };
 

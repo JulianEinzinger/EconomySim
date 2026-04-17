@@ -19,7 +19,7 @@ export class UserService {
         try {
             let connection = await getDBConnection();
 
-            const rows: UserRow[] = (await connection.execute<UserRow>(`SELECT * FROM users`)).rows ?? [];
+            const rows: UserRow[] = (await connection.execute<UserRow>(`SELECT * FROM es_users`)).rows ?? [];
             console.log(rows);
             
             users = rows.map<User>(e => ({
@@ -51,7 +51,7 @@ export class UserService {
             const saltRounds = 10;
             const passwordHash: string = await bcrypt.hash(password, saltRounds);
 
-            const result: Result<{ id: number[] }> = await connection.execute(`INSERT INTO users (username, password_hash) VALUES (:username, :passwordHash) RETURNING id INTO :id`, {
+            const result: Result<{ id: number[] }> = await connection.execute(`INSERT INTO es_users (username, password_hash) VALUES (:username, :passwordHash) RETURNING id INTO :id`, {
                 username: username,
                 passwordHash: passwordHash,
                 id: { dir: BIND_OUT, type: NUMBER }
@@ -83,7 +83,7 @@ export class UserService {
         try {
             let connection = await getDBConnection();
 
-            const result: Result<UserRow> = await connection.execute(`SELECT * FROM users WHERE username = :username`, {
+            const result: Result<UserRow> = await connection.execute(`SELECT * FROM es_users WHERE username = :username`, {
                 username: username
             });
             const user = result.rows?.[0];
@@ -113,7 +113,7 @@ export class UserService {
         try {
             let connection = await getDBConnection();
 
-            const result: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT c.*, bt.name as BUSINESS_TYPE_NAME FROM companies c JOIN business_types bt ON c.business_type_id = bt.id WHERE c.ownerId = :userId", {
+            const result: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT c.*, bt.name as BUSINESS_TYPE_NAME FROM es_companies c JOIN es_business_types bt ON c.business_type_id = bt.id WHERE c.ownerId = :userId", {
                 userId: userId
             })).rows ?? [];
 
@@ -153,7 +153,7 @@ export class UserService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: Result<{ balance: number }> = (await connection.execute<{ balance: number }>("SELECT u.balance FROM users u WHERE u.id = :userId", {
+            const result: Result<{ balance: number }> = (await connection.execute<{ balance: number }>("SELECT u.balance FROM es_users u WHERE u.id = :userId", {
                 userId: userId
              }));
 

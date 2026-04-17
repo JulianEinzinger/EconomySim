@@ -13,7 +13,7 @@ export class ItemService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: ProductRow[] = (await connection.execute<ProductRow>("SELECT p.*, pc.name AS PRODUCT_CATEGORY FROM products p JOIN product_categories pc ON p.product_category_id = pc.id")).rows ?? [];
+            const result: ProductRow[] = (await connection.execute<ProductRow>("SELECT p.*, pc.name AS PRODUCT_CATEGORY FROM es_products p JOIN es_product_categories pc ON p.product_category_id = pc.id")).rows ?? [];
        
             await connection.close();
 
@@ -39,7 +39,7 @@ export class ItemService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: InventoryItemRow[] = (await connection.execute<InventoryItemRow>("SELECT wi.*, p.*, pc.name AS PRODUCT_CATEGORY FROM warehouse_items wi JOIN products p ON wi.product_id = p.id JOIN product_categories pc ON p.product_category_id = pc.id WHERE wi.warehouse_id = :warehouseId ORDER BY p.name", {
+            const result: InventoryItemRow[] = (await connection.execute<InventoryItemRow>("SELECT wi.*, p.*, pc.name AS PRODUCT_CATEGORY FROM es_warehouse_items wi JOIN products p ON wi.product_id = p.id JOIN es_product_categories pc ON p.product_category_id = pc.id WHERE wi.warehouse_id = :warehouseId ORDER BY p.name", {
                 warehouseId: warehouseId
             })).rows ?? [];
         
@@ -90,13 +90,13 @@ export class ItemService {
     p.unit            AS UNIT,
     pc.name           AS PRODUCT_CATEGORY
 
-FROM warehouses w
-JOIN locations l ON w.location_id = l.id
-JOIN countries c ON l.country_code = c.country_code
+FROM es_warehouses w
+JOIN es_locations l ON w.location_id = l.id
+JOIN es_countries c ON l.country_code = c.country_code
 
-LEFT JOIN warehouse_items wi ON wi.warehouse_id = w.id
-LEFT JOIN products p ON wi.product_id = p.id
-LEFT JOIN product_categories pc ON p.product_category_id = pc.id
+LEFT JOIN es_warehouse_items wi ON wi.warehouse_id = w.id
+LEFT JOIN es_products p ON wi.product_id = p.id
+LEFT JOIN es_product_categories pc ON p.product_category_id = pc.id
 
 WHERE w.company_id = :companyId
 ORDER BY w.id, p.name`,
@@ -148,7 +148,7 @@ ORDER BY w.id, p.name`,
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: Result<{ id: number[] }> = (await connection.execute<{ id: number[] }>('INSERT INTO products (name, img_url, product_category_id, unit) VALUES (:name, :imgUrl, :productCategoryId, :unit) RETURNING id INTO :id', {
+            const result: Result<{ id: number[] }> = (await connection.execute<{ id: number[] }>('INSERT INTO es_products (name, img_url, product_category_id, unit) VALUES (:name, :imgUrl, :productCategoryId, :unit) RETURNING id INTO :id', {
                 name: name,
                 imgUrl: imgUrl,
                 productCategoryId: productCategoryId,

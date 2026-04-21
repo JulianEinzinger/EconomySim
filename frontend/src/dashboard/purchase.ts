@@ -1,4 +1,4 @@
-import type { Wholesaler, WholesalerProduct } from "@economysim/shared";
+import type { Wholesaler, WholesalerOrderItem, WholesalerProduct } from "@economysim/shared";
 import { Utils } from "../utils.js";
 
 await Utils.checkAuth();
@@ -265,7 +265,7 @@ function renderCarts() {
         checkoutBtn.classList.add('btn', 'btn-success', 'btn-sm', 'checkout-btn');
         checkoutBtn.textContent = 'Checkout';
 
-        checkoutBtn.onclick = () => checkoutWholesaler(cart.wholesaler.id);
+        checkoutBtn.onclick = async () => await checkoutWholesaler(cart.wholesaler.id);
 
         group.append(header, itemsDiv, subtotalDiv, checkoutBtn);
         cartgroupsDiv.appendChild(group);
@@ -295,7 +295,7 @@ function removeFromCart(wholesalerId: number, productId: number) {
     renderCarts();
 }
 
-function checkoutWholesaler(wholesalerId: number) {
+async function checkoutWholesaler(wholesalerId: number) {
     const cart = carts.get(wholesalerId);
     if(!cart) return;
 
@@ -308,6 +308,30 @@ function checkoutWholesaler(wholesalerId: number) {
     };
 
     console.log('ORDER →', order);
+
+    const companyId = localStorage.getItem('current-company-id');
+    const payload: {companyId: any, wholesalerId: number, items: WholesalerOrderItem[]} = {
+        companyId,
+        wholesalerId,
+        items: Array.from(cart.items.values()).map(ci => ({
+            id: -1, // backend will ignore this
+            order_id: -1, // backend will ignore this
+            product_id: ci.product.id,
+            quantity: ci.quantity,
+            pricePerUnit: ci.product.price,
+            subtotal: ci.product.price * ci.quantity
+        }))
+    }
+
+    const token = localStorage.getItem('token');
+    const res = await fetch("http://localhost:3000/wholesalers/purchase", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+    });
     
     carts.delete(wholesalerId);
     saveCartsToSessionStorage();

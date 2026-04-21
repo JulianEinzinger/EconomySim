@@ -1,5 +1,6 @@
-import type { Connection } from "oracledb";
-import type { Wholesaler, WholesalerProduct, WholesalerRow } from "@economysim/shared";
+import oracledb, { type Connection, type Result } from "oracledb";
+const { BIND_OUT, NUMBER } = oracledb;
+import { DeliveryStatus, PaymentStatus, type Wholesaler, type WholesalerOrderItem, type WholesalerProduct, type WholesalerRow } from "@economysim/shared";
 import { getDBConnection } from "../data.js";
 
 export class WholesalerSevice {
@@ -65,12 +66,50 @@ FROM wholesalers w
         }
     }
 
-    async purchaseFromWholesaler(wholesalerId: number, items: { productId: number, quantity: number }[]): Promise<boolean> {
+    async createOrder(companyId: number, wholesalerId: number, items: WholesalerOrderItem[]): Promise<{success: boolean, orderId: number}> {
         try {
-            return true;
+            const connection: Connection = await getDBConnection();
+
+            const orderDate: Date = new Date(); // current date
+            const deliveryDate: Date = this.calculateDeliveryDate(wholesalerId, companyId);
+            const totalPrice: number = items.reduce((sum, item) => sum + (item.pricePerUnit * item.quantity), 0);
+
+            const result: Result<{ id: number[] }> = await connection.execute(`INSERT INTO es_wholesaler_orders (company_id, wholesaler_id, order_date, delivery_date, 
+                total_price, payment_status, delivery_status) VALUES (:company_id, :wholesaler_id, :order_date, :delivery_date, :total_price, :payment_status, :delivery_status) RETURNING id INTO :id`, {
+                    company_id: companyId,
+                    wholesaler_id: wholesalerId,
+                    order_date: orderDate,
+                    delivery_date: deliveryDate,
+                    total_price: totalPrice,
+                    payment_status: PaymentStatus.PENDING,
+                    delivery_status: DeliveryStatus.IN_TRANSIT,
+                    id: { dir: BIND_OUT, type: NUMBER }
+                });
+
+            if(!result.outBinds) throw new Error('SQL Outbinds are empty!');
+
+            const orderId = result.outBinds.id[0];
+            if(!orderId) throw new Error("Failed to retrieve order ID from database!");
+            
+            // TODO - insert order items into es_wholesaler_order_items
+
+            await connection.commit();
+            await connection.close();
+
+            return {
+                success: true,
+                orderId: orderId
+            };
         } catch(err) {
             console.error(`Something happened while trying to make a purchase: ${err}`);
-            return false;
+            return {
+                success: false,
+                orderId: -1
+            };
         }
+    }
+
+    calculateDeliveryDate(wholesalerId: number, companyId: number): Date {
+        return new Date(Date.parse('17 July 2026')); // TODO - implement actual delivery date calculation based on haversine distance and other factors
     }
 }

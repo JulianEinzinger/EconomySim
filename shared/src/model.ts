@@ -232,3 +232,21 @@ export type WholesalerOrderRow = {
     PAYMENT_STATUS: PaymentStatus,
     DELIVERY_STATUS: DeliveryStatus
 }
+
+export type WholesalerOrderItem = {
+    id: number,
+    order_id: number,
+    product_id: number,
+    quantity: number,
+    pricePerUnit: number,
+    subtotal: number
+}
+
+export type WholesalerOrderItemRow = {
+    ID: number,
+    ORDER_ID: number,
+    PRODUCT_ID: number,
+    QUANTITY: number,
+    PRICE_PER_UNIT: number,
+    SUBTOTAL: number
+}

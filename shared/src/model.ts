@@ -199,3 +199,36 @@ export type WholesalerProduct = Product & {
     max_order_stacks: number,
     category_img_url: string
 }
+
+export enum PaymentStatus {
+    PENDING = 'Pending',
+    PAYED = 'Payed',
+    OVERDUE = 'Overdue'
+}
+
+export enum DeliveryStatus {
+    IN_TRANSIT = 'In Transit',
+    DELIVERED = 'Delivered'
+}
+
+export type WholesalerOrder = {
+    id: number,
+    companyId: number,
+    wholesalerId: number,
+    orderDate: Date,
+    deliveryDate: Date,
+    totalPrice: number,
+    paymentStatus: PaymentStatus,
+    deliveryStatus: DeliveryStatus
+}
+
+export type WholesalerOrderRow = {
+    ID: number,
+    COMPANY_ID: number,
+    WHOLESALER_ID: number,
+    ORDER_DATE: Date,
+    DELIVERY_DATE: Date,
+    TOTAL_PRICE: number,
+    PAYMENT_STATUS: PaymentStatus,
+    DELIVERY_STATUS: DeliveryStatus
+}

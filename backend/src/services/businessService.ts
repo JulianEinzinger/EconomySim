@@ -11,7 +11,7 @@ export class BusinessService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: BusinessTypeRow[] = (await connection.execute<BusinessTypeRow>("SELECT * FROM business_types ORDER BY id DESC")).rows ?? [];
+            const result: BusinessTypeRow[] = (await connection.execute<BusinessTypeRow>("SELECT * FROM es_business_types ORDER BY id DESC")).rows ?? [];
 
             return result.map<BusinessType>(row => ({
                 id: row.ID,

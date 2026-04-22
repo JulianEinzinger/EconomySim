@@ -12,7 +12,7 @@ export class LocationService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: CountryRow[] = (await connection.execute<CountryRow>("SELECT * FROM countries")).rows ?? [];
+            const result: CountryRow[] = (await connection.execute<CountryRow>("SELECT * FROM es_countries")).rows ?? [];
 
             await connection.close();
 
@@ -34,7 +34,7 @@ export class LocationService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: CityRow[] = (await connection.execute<CityRow>("SELECT * FROM cities")).rows ?? [];
+            const result: CityRow[] = (await connection.execute<CityRow>("SELECT * FROM es_cities")).rows ?? [];
 
             await connection.close();
 
@@ -58,7 +58,7 @@ export class LocationService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: LocationRow[] = (await connection.execute<LocationRow>("SELECT l.id, l.name, l.latitude, l.longitude, l.city_name, l.country_code FROM locations l WHERE NOT EXISTS (SELECT 1 FROM companies c WHERE c.location_id = l.id) AND NOT EXISTS (SELECT 1 FROM wholesalers w WHERE w.location_id = l.id)")).rows ?? [];
+            const result: LocationRow[] = (await connection.execute<LocationRow>("SELECT l.id, l.name, l.latitude, l.longitude, l.city_name, l.country_code FROM es_locations l WHERE NOT EXISTS (SELECT 1 FROM es_companies c WHERE c.location_id = l.id) AND NOT EXISTS (SELECT 1 FROM es_wholesalers w WHERE w.location_id = l.id)")).rows ?? [];
 
             await connection.close();
 

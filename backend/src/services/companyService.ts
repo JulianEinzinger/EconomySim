@@ -50,7 +50,7 @@ export class CompanyService {
                 const connection: Connection = await getDBConnection();
 
                 // create bank account
-                const bankAccountResult: Result<{ id: number[] }> = await connection.execute<{ id: number[] }>(`INSERT INTO bank_accounts (balance) VALUES (DEFAULT) RETURNING id INTO :id`, ({
+                const bankAccountResult: Result<{ id: number[] }> = await connection.execute<{ id: number[] }>(`INSERT INTO es_bank_accounts (balance) VALUES (DEFAULT) RETURNING id INTO :id`, ({
                     id: { dir: BIND_OUT, type: NUMBER }
                 }));
 
@@ -60,7 +60,7 @@ export class CompanyService {
 
                 if(!bankAccountId) throw new Error("Failed to retrieve bank account ID from database!");
 
-                const result: Result<{ id: number[] }> = await connection.execute<{ id: number[] }>(`INSERT INTO companies (name, ownerid, location_id , business_type_id, 
+                const result: Result<{ id: number[] }> = await connection.execute<{ id: number[] }>(`INSERT INTO es_companies (name, ownerid, location_id , business_type_id, 
                     primary_color, secondary_color, bank_account_id) VALUES (:name, :ownerid, :locationId, :businessTypeId, :primaryColor, :secondaryColor, :bankAccountId)
                     RETURNING id INTO :id`, ({
                         name: name,
@@ -99,7 +99,7 @@ export class CompanyService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const rows: { COUNT: number }[] = (await connection.execute<{ COUNT: number }>(`SELECT COUNT(*) AS COUNT FROM companies WHERE id = :companyId AND ownerid = :userId`, {
+            const rows: { COUNT: number }[] = (await connection.execute<{ COUNT: number }>(`SELECT COUNT(*) AS COUNT FROM es_companies WHERE id = :companyId AND ownerid = :userId`, {
                 companyId: companyId,
                 userId: userId
             })).rows ?? [];
@@ -133,7 +133,7 @@ export class CompanyService {
 
             const connection: Connection = await getDBConnection();
 
-            const rows: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT c.id, c.name, c.ownerid, c.business_type_id, b.balance FROM companies c LEFT JOIN bank_accounts b ON c.bank_account_id = b.id WHERE c.id = :companyId", {
+            const rows: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT c.id, c.name, c.ownerid, c.business_type_id, b.balance FROM es_companies c LEFT JOIN es_bank_accounts b ON c.bank_account_id = b.id WHERE c.id = :companyId", {
                 companyId: companyId
             })).rows ?? [];
 
@@ -165,7 +165,7 @@ export class CompanyService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: { COMPANY_ID: number}[] = (await connection.execute<{ COMPANY_ID: number }>(`SELECT COMPANY_ID FROM warehouses WHERE ID = :warehouseId`, {
+            const result: { COMPANY_ID: number}[] = (await connection.execute<{ COMPANY_ID: number }>(`SELECT COMPANY_ID FROM es_warehouses WHERE ID = :warehouseId`, {
                 warehouseId: warehouseId
             })).rows ?? [];
 

@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { authenticateDev } from "../services/authService.js";
 import { StatusCodes } from "http-status-codes";
 import { ItemService } from "../services/itemService.js";
+import { WholesalerSevice } from "../services/wholesalerService.js";
 
 export const devRouter = Router();
 
@@ -28,4 +29,13 @@ devRouter.post("/products", authenticateDev, async (req: Request, res: Response)
     } else {
         res.status(StatusCodes.CREATED).json({ message, productId });
     }
+});
+
+devRouter.get("/delivery-date", authenticateDev, async (req: Request, res: Response) => {
+    const {wholesalerId, companyId}: {wholesalerId: number, companyId: number} = req.body;
+
+    const service: WholesalerSevice = new WholesalerSevice();
+
+    const deliveryDate = await service.calculateDeliveryDate(wholesalerId, companyId);
+    res.status(StatusCodes.OK).json({ deliveryDate: deliveryDate });
 });

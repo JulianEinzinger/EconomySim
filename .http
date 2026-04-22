@@ -63,3 +63,14 @@ Authorization: Bearer dev123
     "productCategoryId": 2,
     "unit": "Stk"
 }
+
+###
+
+GET {{baseUrl}}/dev/delivery-date
+Content-Type: application/json
+Authorization: Bearer dev123
+
+{
+    "wholesalerId": 1,
+    "companyId": 3
+}

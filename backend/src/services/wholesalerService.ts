@@ -70,6 +70,12 @@ FROM es_wholesalers w
         try {
             const connection: Connection = await getDBConnection();
 
+            // TODO - validate items (check if wholesaler actually sells the products, check if stock is sufficient, etc.)
+            const validationResult = await connection.execute(`SELECT 1 FROM es_wholesaler_products WHERE wholesaler_id = :wholesaler_id AND product_id = :product_id AND stock_quantity >= :quantity`, {
+                wholesaler_id: wholesalerId,
+                
+            });
+
             const orderDate: Date = new Date(); // current date
             const deliveryDate: Date = this.calculateDeliveryDate(wholesalerId, companyId);
             const totalPrice: number = items.reduce((sum, item) => sum + (item.pricePerUnit * item.quantity), 0);
@@ -92,6 +98,18 @@ FROM es_wholesalers w
             if(!orderId) throw new Error("Failed to retrieve order ID from database!");
             
             // TODO - insert order items into es_wholesaler_order_items
+            const itemsRes = await connection.executeMany(`INSERT INTO es_wholesaler_order_items (order_id, product_id, 
+                quantity, price_per_unit, subtotal) VALUES (:order_id, :product_id, :quantity, :price_per_unit, :subtotal)`,
+                items.map(i => ({
+                    order_id: orderId,
+                    product_id: i.product_id,
+                    quantity: i.quantity,
+                    price_per_unit: i.pricePerUnit,
+                    subtotal: i.quantity * i.pricePerUnit
+                }))
+            );
+            console.log(`Inserted ${itemsRes.rowsAffected} order items for order ID ${orderId}`);
+            
 
             await connection.commit();
             await connection.close();

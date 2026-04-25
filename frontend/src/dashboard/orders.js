@@ -15,6 +15,7 @@ const detailSubtitle = document.getElementById('detail-subtitle');
 const detailMetadata = document.getElementById('detail-metadata');
 const detailItems = document.getElementById('detail-items');
 const itemsNote = document.getElementById('items-note');
+const payBtn = document.getElementById('pay-btn');
 
 const searchInput = document.getElementById('search-input');
 const paymentFilter = document.getElementById('payment-filter');
@@ -342,6 +343,12 @@ async function renderDetails() {
             <strong>${formatCurrency(item.subtotal)}</strong>
         </div>    
     `).join("");
+
+    // Pay Button
+    payBtn.classList.toggle('hidden', !['PENDING', 'OVERDUE'].includes(order.paymentStatus));
+    payBtn.classList.remove('pending', 'overdue');
+    if (order.paymentStatus === 'PENDING') payBtn.classList.add('pending');
+    if (order.paymentStatus === 'OVERDUE') payBtn.classList.add('overdue');
 }
 
 async function loadOrderItems(orderId) {
@@ -411,6 +418,10 @@ function registerFilters() {
             renderDetails();
         });
     })
+}
+
+async function handlePayOrder() {
+    // TODO: Payment handling
 }
 
 registerFilters();

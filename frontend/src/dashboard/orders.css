@@ -419,10 +419,6 @@ a {
     font-size: 36px;
 }
 
-.hidden {
-    display: none;
-}
-
 @media (max-width: 1200px) {
     .summary-grid,
     .controls-row,
@@ -468,4 +464,56 @@ a {
     .table-panel {
         overflow-x: auto;
     }
+}
+
+.detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 0;
+}
+
+.pay-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 999px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.pay-btn .material-icons-outlined {
+    font-size: 16px;
+}
+
+/* Pending → gleiche Farbe wie .status-badge.paid */
+.pay-btn.pending {
+    background-color: #e4f3eb;
+    color: #367952;
+}
+
+.pay-btn.pending:hover {
+    background-color: #c8ebd7;
+}
+
+/* Overdue → gleiche Farbe wie .status-badge.overdue */
+.pay-btn.overdue {
+    background-color: #fde8ea;
+    color: #c23c43;
+}
+
+.pay-btn.overdue:hover {
+    background-color: #fac9cc;
+}
+
+.hidden {
+    display: none;
 }

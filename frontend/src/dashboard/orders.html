@@ -164,7 +164,7 @@
                                 <h2 id="detail-title">Order</h2>
                                 <p id="detail-subtitle"></p>
                             </div>
-                            <button id="pay-btn" class="pay-btn hidden" onclick="handlePayOrder()">
+                            <button id="pay-btn" class="pay-btn hidden">
                                 <span class="material-icons-outlined">payments</span>
                                 Pay now
                             </button>
@@ -183,7 +183,42 @@
                 </aside>
             </section>
         </main>
-    </div>
+  
+        <!-- Payment Modal -->
+         <div class="modal-backdrop hidden" id="pay-modal-backdrop">
+            <div class="modal" id="pay-modal">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="modal-title">Confirm Payment</h2>
+                        <p id="modal-subtitle"></p>
+                    </div>
+                    <button class="modal-close-btn" id="modal-close-btn">
+                        <span class="material-icons-outlined">close</span>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <p class="modal-label">Select bank account</p>
+                    <div class="account-list" id="account-list">
+                        <div class="account-skeleton"></div>
+                        <div class="account-skeleton"></div>
+                    </div>
+
+                    <div class="modal-summary" id="modal-summary">
+                        <span>Total due</span>
+                        <strong id="modal-total"></strong>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="modal-cancel-btn">Cancel</button>
+                    <button class="btn-primary" id="modal-confirm-btn" disabled>
+                        <span class="material-icons-outlined">check_circle</span>
+                        Confirm payment
+                    </button>
+                </div>
+            </div>
+        </div>
 
     <script src="orders.js" type="module"></script>
     <script src="sidebar.js" type="module"></script>

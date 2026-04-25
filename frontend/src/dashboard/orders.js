@@ -17,6 +17,8 @@ const detailItems = document.getElementById('detail-items');
 const itemsNote = document.getElementById('items-note');
 const payBtn = document.getElementById('pay-btn');
 
+payBtn.addEventListener('click', handlePayOrder);
+
 const searchInput = document.getElementById('search-input');
 const paymentFilter = document.getElementById('payment-filter');
 const deliveryFilter = document.getElementById('delivery-filter');
@@ -161,6 +163,13 @@ function formatDay(date) {
         month: "2-digit",
         year: "numeric"
     }).format(date);
+}
+
+function formatIban(iban) {
+    return String(iban)
+  .replace(/\s+/g, '')
+  .replace(/(.{4})/g, '$1 ')
+  .trim();
 }
 
 function getTime(date) {
@@ -420,9 +429,139 @@ function registerFilters() {
     })
 }
 
+
+
+// ─── Payment Modal ────────────────────────────
+const payModalBackdrop  = document.getElementById('pay-modal-backdrop');
+const modalTitle        = document.getElementById('modal-title');
+const modalSubtitle     = document.getElementById('modal-subtitle');
+const modalTotal        = document.getElementById('modal-total');
+const accountList       = document.getElementById('account-list');
+const modalConfirmBtn   = document.getElementById('modal-confirm-btn');
+const modalCancelBtn    = document.getElementById('modal-cancel-btn');
+const modalCloseBtn     = document.getElementById('modal-close-btn');
+
+let selectedAccountId = null;
+
+// Öffne Modal mit aktueller Order
 async function handlePayOrder() {
-    // TODO: Payment handling
+    const order = state.orders.find(o => o.id === state.selectedOrderId);
+    if(!order) return;
+
+    selectedAccountId = null;
+    modalConfirmBtn.disabled = true;
+
+    modalTitle.textContent = `Pay Order #${order.id}`;
+    modalSubtitle.textContent = `${order.wholesalerName} • ${order.paymentStatus === 'OVERDUE' ? '⚠ Overdue' : 'Payment pending'}`;
+    modalTotal.textContent = formatCurrency(order.totalPrice);
+
+    // Show skeleton
+    accountList.innerHTML = `
+        <div class="account-skeleton"></div>
+        <div class="account-skeleton"></div>
+    `;
+
+    payModalBackdrop.classList.remove('hidden');
+
+    // Load bank accounts
+    const accounts = await loadBankAccounts(); // TODO implement loading bank accounts
+    renderAccountList(accounts, order.totalPrice);
 }
+
+async function loadBankAccounts() {
+    try {
+        throw new Error('Account loading Not Yet Implemented!');
+    } catch {
+        // Fallback-Data for development
+        /*
+        return [
+            { id: 1, name: "Main Business Account", iban: 'AT12 3456 7890 1234 5678', balance: 14350 },
+            { id: 2, name: "Operations Account", iban: 'AT98 7654 3210 9876 5432', balance: 26 }
+        ];
+        */
+       return [];
+    }
+}
+
+function renderAccountList(accounts, orderTotal) {
+    if (accounts.length === 0) {
+        accountList.innerHTML = `<p style="color:#7b8091;font-size:14px;margin:0">No bank accounts found.</p>`
+        return;
+    }
+
+    accountList.innerHTML = accounts.map(acc => {
+        const insufficient = acc.balance < orderTotal;
+        return `
+            <button class="account-option" data-account-id="${acc.id}" ${insufficient ? 'title="Insufficient balance"' : ''}>
+                <div class="account-icon">
+                    <span class="material-icons-outlined">account_balance</span>
+                </div>
+                <div class="account-info">
+                    <span class="account-name">${escapeHtml(acc.name)}</span>
+                    <span class="account-iban">${formatIban(acc.iban)}</span>
+                </div>
+                <span class="account-balance ${insufficient ? 'insufficient' : ''}">
+                    ${formatCurrency(acc.balance)}
+                </span>
+            </button>
+        `;
+    }).join('');
+
+    accountList.querySelectorAll('.account-option').forEach(btn => {
+        btn.addEventListener("click", () => {
+            accountList.querySelectorAll('.account-option').forEach(b => b.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
+            selectedAccountId = Number(btn.dataset.accountId);
+            modalConfirmBtn.disabled = false;
+        });
+    });
+}
+
+function closeModal() {
+    payModalBackdrop.classList.add('hidden');
+    selectedAccountId = null;
+}
+
+// confirm payment
+modalConfirmBtn.addEventListener("click", async () => {
+    const order = state.orders.find(o => o.id === state.selectedOrderId);
+    if(!order || !selectedAccountId) return;
+
+    modalConfirmBtn.disabled = true;
+    modalConfirmBtn.innerHTML = `<span class="material-icons-outlined">hourglass_top</span> Processing...`;
+
+    try {
+        const response = await fetch(`http://localhost:3000/...`, { // TODO implement paying order
+            method: 'TODO',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ bankAccountId: selectedAccountId })
+        });
+
+        if(!response.ok) throw new Error(`Something happened while trying to pay order #${order.id}`);
+
+        // Status lokal aktualisieren
+        order.paymentStatus = 'PAID';
+        order.paymentDate = new Date();
+
+        closeModal();
+        renderOrders();
+    } catch {
+        modalConfirmBtn.disabled = false;
+        modalConfirmBtn.innerHTML = `<span class="material-icons-outlined>check_circle</span> Confirm payment`;
+        alert('Payment failed. Please try again.');
+    }
+});
+
+modalCancelBtn.addEventListener('click', closeModal);
+modalCloseBtn.addEventListener('click', closeModal);
+
+// Backdrop-Click closing modal
+payModalBackdrop.addEventListener('click', (e) => {
+    if (e.target === payModalBackdrop) closeModal();
+})
 
 registerFilters();
 await loadOrders();

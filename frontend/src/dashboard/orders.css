@@ -419,6 +419,246 @@ a {
     font-size: 36px;
 }
 
+/* ── Payment Modal ─────────────────────────────────── */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(33, 35, 45, 0.55);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.15s ease;
+}
+
+.modal-backdrop.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.modal {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(33, 35, 45, 0.25);
+    width: 100%;
+    max-width: 460px;
+    margin: 20px;
+    animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(16px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid #edf0f5;
+    gap: 12px;
+}
+
+.modal-header h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    color: #21232d;
+}
+
+.modal-header p {
+    margin: 0;
+    font-size: 13px;
+    color: #7b8091;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #8a8d9a;
+    padding: 2px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.modal-close-btn:hover { color: #21232d; }
+
+.modal-body {
+    padding: 20px 24px;
+}
+
+.modal-label {
+    margin: 0 0 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #7b8091;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.account-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.account-skeleton {
+    height: 64px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #f0f2f7 25%, #e4e7ef 50%, #f0f2f7 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.account-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 2px solid #edf0f5;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+    background: white;
+    width: 100%;
+    text-align: left;
+    font-family: "Montserrat", sans-serif;
+}
+
+.account-option:hover {
+    border-color: #c5d0f0;
+    background: #f8fbff;
+}
+
+.account-option.is-selected {
+    border-color: #355ec9;
+    background: #f0f5ff;
+}
+
+.account-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #e4edff;
+    color: #355ec9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.account-icon .material-icons-outlined { font-size: 20px; }
+
+.account-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+}
+
+.account-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #21232d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.account-iban {
+    font-size: 12px;
+    color: #7b8091;
+}
+
+.account-balance {
+    font-size: 14px;
+    font-weight: 700;
+    color: #21232d;
+    flex-shrink: 0;
+}
+
+.account-balance.insufficient {
+    color: #c23c43;
+}
+
+.modal-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: #f8f9fc;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #5f6475;
+}
+
+.modal-summary strong {
+    font-size: 18px;
+    color: #21232d;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px 20px;
+    border-top: 1px solid #edf0f5;
+}
+
+.btn-secondary {
+    padding: 9px 18px;
+    border: 1px solid #d4d7df;
+    border-radius: 6px;
+    background: white;
+    font-family: "Montserrat", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #5f6475;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-secondary:hover { background: #f8f9fc; }
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border: none;
+    border-radius: 6px;
+    background: #355ec9;
+    font-family: "Montserrat", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-primary:hover:not(:disabled) { background: #2b4fa8; }
+
+.btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.btn-primary .material-icons-outlined { font-size: 16px; }
+
 @media (max-width: 1200px) {
     .summary-grid,
     .controls-row,

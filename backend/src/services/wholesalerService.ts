@@ -313,6 +313,31 @@ FROM es_wholesalers w
     }
 
     /**
+     * Retrieves the company id a specific order with the given id belongs to
+     * @param orderId 
+     * @returns the company id, or -1 otherwise
+     */
+    async getCompanyIdForOrderId(orderId: number): Promise<number> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result: { COMPANY_ID: number }[] = (await connection.execute<{ COMPANY_ID: number }>(`SELECT company_id FROM es_wholesaler_orders WHERE id = :order_id`, {
+                order_id: orderId
+            })).rows ?? [];
+
+            await connection.close();
+
+            if(result.length > 0 && result[0]) {
+                return result[0].COMPANY_ID;
+            }
+            return -1;
+        } catch (err) {
+            console.error(`Something happened while trying to retrieve company id for order with id ${orderId}: ${err}`);
+            return -1;
+        }
+    }
+
+    /**
      * Updates the payment status of an order
      * @param orderId 
      * @param status 

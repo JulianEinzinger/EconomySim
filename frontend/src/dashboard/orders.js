@@ -92,7 +92,7 @@ function normalizeItem(item) {
 function normalizePaymentStatus(status) {
     const normalized = String(status ?? "").trim().toUpperCase().replaceAll(" ", "_");
     switch(normalized) {
-        case "PAID":
+        case "PAYED":
             return "PAID";
             break;
         case "OVERDUE":
@@ -204,25 +204,23 @@ function paymentRank(status) {
 
 function deliveryRank(status) {
     switch (status) {
-        case "PENDING":
-            return 0;
         case "IN_TRANSIT":
-            return 1;
+            return 0;
         case "DELIVERED":
-            return 2;
+            return 1;
         default:
-            return 3;
+            return 2;
     }
 }
 
 function renderSummary(orders) {
-    const openOrders = orders.filter(order => order.deliveryStatus !== "DELIVERED").length;
-    const pendingPayments = orders.filter(order => order.deliveryStatus === "PENDING").length;
-    const overduePaments = orders.filter(order => order.dpaymentStatus === "OVERDUE").length;
+    const openOrders = orders.filter(order => order.deliveryStatus === "IN_TRANSIT").length;
+    const pendingPayments = orders.filter(order => order.paymentStatus === "PENDING").length;
+    const overduePaments = orders.filter(order => order.paymentStatus === "OVERDUE").length;
     const totalValue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
 
     const cards = [
-        { label: "Open orders", value: openOrders, caption: "Orders still in progress" },
+        { label: "Open orders", value: openOrders, caption: "Orders still in transit" },
         { label: "Pending payments", value: pendingPayments, caption: "Orders waiting for payment" },
         { label: "Overdue", value: overduePaments, caption: "Orders that need attention" },
         { label: "Order volume", value: formatCurrency(totalValue), caption: `${orders.length} orders in this view` }

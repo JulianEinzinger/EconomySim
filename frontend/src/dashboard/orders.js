@@ -260,7 +260,7 @@ function renderOrders() {
             <td>
                 <div class="order-identifier">
                     <strong>#${order.id}</strong>
-                    <span class="secondary-text">${order.items.length ?? 0} items</span>
+                    <span class="secondary-text">${order.items?.length ?? 0} items</span>
                 </div>
             </td>
             <td>${escapeHtml(order.wholesalerName)}</td>

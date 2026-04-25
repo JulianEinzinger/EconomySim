@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <link rel="stylesheet" href="orders.css">
+</head>
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+            <div class="header-left">
+                <!-- Could be added a search bar here in the future -->
+            </div>
+            <div class="header-right">
+                <span class="material-icons-outlined">notifications</span>
+                <span class="material-icons-outlined">mail</span>
+                <span class="material-icons-outlined">account_circle</span>
+            </div>
+        </header>
+
+        <aside id="sidebar">
+            <div class="sidebar-title">
+                <div class="sidebar-logo">
+                    <span class="material-icons-outlined">inventory</span>
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <div class="balance-display">
+                <span class="material-icons-outlined">account_balance_wallet</span>
+            </div>
+
+            <ul class="sidebar-list">
+                <li>
+                    <a href="dashboard.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">dashboard</span> Dashboard
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="inventory.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">warehouse</span> Inventory
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="economics.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">analytics</span> Economics
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="purchase.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">add_shopping_cart</span> Purchase
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="orders.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">receipt_long</span> Orders
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="settings.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">settings</span> Settings
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-container">
+            <div class="main-title">
+                <div>
+                    <p class="font-weight-bold">ORDERS</p>
+                    <span class="subtitle">Track incoming wholesaler orders, payments and delivery progress.</span>
+                </div>
+            </div>
+
+            <section class="summary-grid" id="summary-grid"></section>
+
+            <section class="panel controls-panel">
+                <div class="controls-row">
+                    <label class="control">
+                        <span>Search</span>
+                        <input id="search-input" type="search" placeholder="Order ID or wholesaler">
+                    </label>
+                    <label class="control">
+                        <span>Payment</span>
+                        <select id="payment-filter">
+                            <option value="ALL">All</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="PAID">Paid</option>
+                            <option value="OVERDUE">Overdue</option>
+                        </select>
+                    </label>
+                    <label class="control">
+                        <span>Delivery</span>
+                        <select id="delivery-filter">
+                            <option value="ALL">All</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="IN_TRANSIT">In Transit</option>
+                            <option value="DELIVERED">Delivered</option>
+                        </select>
+                    </label>
+                    <label class="control">
+                        <span>Sorty by</span>
+                        <select id="sort-select">
+                            <option value="DATE_DESC">Newest first</option>
+                            <option value="DATE_ASC">Oldest first</option>
+                            <option value="TOTAL_DESC">Highest total</option>
+                            <option value="TOTAL_ASC">Lowest total</option>
+                            <option value="PAYMENT">Payment status</option>
+                            <option value="DELIVERY">Delivery status</option>
+                        </select>
+                    </label>
+                </div>
+            </section>
+
+            <section class="content-grid">
+                <div class="panel table-panel">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Wholesaler</th>
+                                <th>Ordered</th>
+                                <th>Delivery</th>
+                                <th>Total</th>
+                                <th>Payment</th>
+                                <th>Delivery status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-body"></tbody>
+                    </table>
+                    <div class="empty-state hidden"  id="empty-state">
+                        <span class="material-icons-outlined">inventory_2</span>
+                        <p>No orders match the current filters.</p>
+                    </div>
+                </div>
+
+                <aside class="panel detail-panel" id="detail-panel">
+                    <div class="detail-placeholder" id="detail-placeholder">
+                        <span class="material-icons-outlined">touch_app</span>
+                        <p>Select an order to inspect its details.</p>
+                    </div>
+                    <div class="detail-content hidden" id="detail-content">
+                        <div class="detail-header">
+                            <div>
+                                <h2 id="detail-title">Order</h2>
+                                <p id="detail-subtitle"></p>
+                            </div>
+                        </div>
+
+                        <dl class="detail-metadata" id="detail-metadata"></dl>
+
+                        <div class="detail-section">
+                            <div class="section-heading">
+                                <h3>Items</h3>
+                                <span id="items-note" class="items-note"></span>
+                            </div>
+                            <div class="detail-items" id="detail-items"></div>
+                        </div>
+                    </div>
+                </aside>
+            </section>
+        </main>
+    </div>
+
+    <script src="order.js" type="module"></script>
+    <script src="sidebar.js" type="module"></script>
+</body>
+</html>

@@ -78,7 +78,6 @@ FROM es_wholesalers w
         try {
             const connection: Connection = await getDBConnection();
 
-            // TODO - validate items (check if wholesaler actually sells the products, check if stock is sufficient, etc.)
             for(const i of items) {
                 console.log(`Checking, if there are ${i.quantity}x ${i.productId}...`);
                 const itemValidationResult = await this.checkAvailability(wholesalerId, i.productId, i.quantity);

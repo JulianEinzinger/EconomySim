@@ -80,11 +80,11 @@ FROM es_wholesalers w
 
             // TODO - validate items (check if wholesaler actually sells the products, check if stock is sufficient, etc.)
             for(const i of items) {
-                console.log(`Checking, if there are ${i.quantity}x ${i.product_id}...`);
-                const itemValidationResult = await this.checkAvailability(wholesalerId, i.product_id, i.quantity);
+                console.log(`Checking, if there are ${i.quantity}x ${i.productId}...`);
+                const itemValidationResult = await this.checkAvailability(wholesalerId, i.productId, i.quantity);
 
                 if(!itemValidationResult) {
-                    throw new Error(`Validation failed for product ID ${i.product_id}: either the wholesaler(id: ${wholesalerId}) doesn't sell this product or there isn't enough stock!`);
+                    throw new Error(`Validation failed for product ID ${i.productId}: either the wholesaler(id: ${wholesalerId}) doesn't sell this product or there isn't enough stock!`);
                 }
             }
 
@@ -115,7 +115,7 @@ FROM es_wholesalers w
                 quantity, price_per_unit, subtotal) VALUES (:order_id, :product_id, :quantity, :price_per_unit, :subtotal)`,
                 items.map(i => ({
                     order_id: orderId,
-                    product_id: i.product_id,
+                    product_id: i.productId,
                     quantity: i.quantity,
                     price_per_unit: i.pricePerUnit,
                     subtotal: i.quantity * i.pricePerUnit
@@ -178,22 +178,45 @@ FROM es_wholesalers w
         try {
             const connection: Connection = await getDBConnection();
 
-            const orderResult: WholesalerOrderRow[] = (await connection.execute<WholesalerOrderRow>(`SELECT * FROM es_wholesaler_orders WHERE company_id = :company_id`, {
+            const orderResult: WholesalerOrderRow[] = (await connection.execute<WholesalerOrderRow>(`SELECT o.id AS O_ID, o.company_id, o.wholesaler_id, o.order_date, o.delivery_date,
+                o.payment_date, o.total_price, o.payment_status, o.delivery_status, i.id AS I_ID, i.product_id , i.quantity, i.price_per_unit, i.subtotal, p.name AS product_name 
+                FROM es_wholesaler_orders o JOIN es_wholesaler_order_items i ON o.id = i.order_id JOIN es_products p ON i.product_id = p.id WHERE o.company_id = :company_id`, {
                 company_id: companyId
             })).rows ?? [];
 
             await connection.close();
 
-            return orderResult.map<WholesalerOrder>(or => ({
-                id: or.ID,
-                companyId: or.COMPANY_ID,
-                wholesalerId: or.WHOLESALER_ID,
-                orderDate: or.ORDER_DATE,
-                deliveryDate: or.DELIVERY_DATE,
-                totalPrice: or.TOTAL_PRICE,
-                paymentStatus: or.PAYMENT_STATUS,
-                deliveryStatus: or.DELIVERY_STATUS
-            }));
+            const orders: Map<number, WholesalerOrder> = new Map();
+
+            orderResult.forEach(or => {
+                if(!orders.has(or.O_ID)) {
+                    orders.set(or.O_ID, ({
+                        id: or.O_ID,
+                        companyId: or.COMPANY_ID,
+                        wholesalerId: or.WHOLESALER_ID,
+                        orderDate: or.ORDER_DATE,
+                        deliveryDate: or.DELIVERY_DATE,
+                        paymentDate: or.PAYMENT_DATE,
+                        paymentStatus: or.PAYMENT_STATUS,
+                        deliveryStatus: or.DELIVERY_STATUS,
+                        totalPrice: or.TOTAL_PRICE,
+                        items: []
+                    }));
+                }
+
+                const newItem: WholesalerOrderItem = {
+                    id: or.I_ID,
+                    orderId: or.O_ID,
+                    productName: or.PRODUCT_NAME,
+                    productId: or.PRODUCT_ID,
+                    quantity: or.QUANTITY,
+                    pricePerUnit: or.PRICE_PER_UNIT,
+                    subtotal: or.SUBTOTAL
+                }
+                orders.get(or.O_ID)?.items.push(newItem);
+            });
+
+            return Array.from(orders.values());
         } catch(err) {
             console.error(`Something happened while trying to retrieve orders from company id:${companyId} from database: ${err}`);
             return [];
@@ -204,13 +227,15 @@ FROM es_wholesalers w
      * Returns an order if it exists and is for the specified company.
      * @param orderId 
      * @param companyId 
-     * @returns an order if successful, null if an error occurs, forbidden if the order is not for the specified company
+     * @returns an order if successful, null if an error occurs
      */
-    async getOrderById(orderId: number, companyId: number): Promise<WholesalerOrder | 'forbidden' | null> {
+    async getOrderById(orderId: number): Promise<WholesalerOrder | null> {
         try {
             const connection: Connection = await getDBConnection();
 
-            const orderResult: Result<WholesalerOrderRow> = await connection.execute<WholesalerOrderRow>(`SELECT * FROM es_wholesaler_orders WHERE id = :order_id LIMIT 1`, {
+            const orderResult: Result<WholesalerOrderRow> = await connection.execute<WholesalerOrderRow>(`SELECT o.id AS O_ID, o.company_id, o.wholesaler_id, o.order_date, o.delivery_date,
+                o.payment_date, o.total_price, o.payment_status, o.delivery_status, i.id AS I_ID, i.product_id , i.quantity, i.price_per_unit, i.subtotal, p.name AS product_name 
+                FROM es_wholesaler_orders o JOIN es_wholesaler_order_items i ON o.id = i.order_id JOIN es_products p ON i.product_id = p.id WHERE o.id = :order_id`, {
                 order_id: orderId
             });
 
@@ -220,22 +245,44 @@ FROM es_wholesalers w
                 throw new Error(`No order found with this id!`);
             }
 
-            const row: WholesalerOrderRow = orderResult.rows[0]!;
+            const rows = orderResult.rows;
 
-            if(row.COMPANY_ID != companyId) {
-                return "forbidden";
-            }
+            const orders: Map<number, WholesalerOrder> = new Map();
 
-            return ({
-                id: row.ID,
-                companyId: row.COMPANY_ID,
-                wholesalerId: row.WHOLESALER_ID,
-                orderDate: row.ORDER_DATE,
-                deliveryDate: row.DELIVERY_DATE,
-                totalPrice: row.TOTAL_PRICE,
-                paymentStatus: row.PAYMENT_STATUS,
-                deliveryStatus: row.DELIVERY_STATUS
+            rows.forEach(or => {
+                if(!orders.has(or.O_ID)) {
+                    orders.set(or.O_ID, ({
+                        id: or.O_ID,
+                        companyId: or.COMPANY_ID,
+                        wholesalerId: or.WHOLESALER_ID,
+                        orderDate: or.ORDER_DATE,
+                        deliveryDate: or.DELIVERY_DATE,
+                        paymentDate: or.PAYMENT_DATE,
+                        paymentStatus: or.PAYMENT_STATUS,
+                        deliveryStatus: or.DELIVERY_STATUS,
+                        totalPrice: or.TOTAL_PRICE,
+                        items: []
+                    }));
+                }
+
+                const newItem: WholesalerOrderItem = {
+                    id: or.I_ID,
+                    orderId: or.O_ID,
+                    productId: or.PRODUCT_ID,
+                    productName: or.PRODUCT_NAME,
+                    quantity: or.QUANTITY,
+                    pricePerUnit: or.PRICE_PER_UNIT,
+                    subtotal: or.SUBTOTAL
+                }
+                orders.get(or.O_ID)?.items.push(newItem);
             });
+
+            const resultArray = Array.from(orders.values());
+
+            if(resultArray.length === 0 || !resultArray[0]) {
+                return null;
+            }
+            return resultArray[0];
         } catch (err) {
             console.error(`Something happened while trying to retrieve order with id ${orderId} from database: ${err}`);
             return null;
@@ -252,7 +299,7 @@ FROM es_wholesalers w
         try {
             const connection: Connection = await getDBConnection();
 
-            const orderResult: Result<WholesalerOrderRow> = await connection.execute<WholesalerOrderRow>(`SELECT * FROM es_wholesaler_orders WHERE id = :order_id LIMIT 1`, {
+            const orderResult: Result<WholesalerOrderRow> = await connection.execute<WholesalerOrderRow>(`SELECT * FROM es_wholesaler_orders WHERE id = :order_id`, {
                 order_id: orderId
             });
             await connection.close();
@@ -294,14 +341,18 @@ FROM es_wholesalers w
 
             const connection: Connection = await getDBConnection();
 
-            const result: WholesalerOrderItemRow[] = (await connection.execute<WholesalerOrderItemRow>(`SELECT * FROM es_wholesaler_order_items WHERE order_id = :order_id`)).rows ?? [];
+            const result: WholesalerOrderItemRow[] = (await connection.execute<WholesalerOrderItemRow>(`SELECT i.*, p.name AS product_name FROM es_wholesaler_order_items i 
+                JOIN es_products ON i.product_id = p.id WHERE order_id = :order_id`, {
+                order_id: orderId
+            })).rows ?? [];
             
             await connection.close();
 
             return result.map<WholesalerOrderItem>(or => ({
                 id: or.ID,
-                order_id: or.ORDER_ID,
-                product_id: or.PRODUCT_ID,
+                orderId: or.ORDER_ID,
+                productName: or.PRODUCT_NAME,
+                productId: or.PRODUCT_ID,
                 quantity: or.QUANTITY,
                 pricePerUnit: or.PRICE_PER_UNIT,
                 subtotal: or.SUBTOTAL

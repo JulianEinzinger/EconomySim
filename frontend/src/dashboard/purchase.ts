@@ -315,8 +315,9 @@ async function checkoutWholesaler(wholesalerId: number) {
         wholesalerId,
         items: Array.from(cart.items.values()).map(ci => ({
             id: -1, // backend will ignore this
-            order_id: -1, // backend will ignore this
-            product_id: ci.product.id,
+            orderId: -1, // backend will ignore this
+            productName: '', // backend will ignore this
+            productId: ci.product.id,
             quantity: ci.quantity,
             pricePerUnit: ci.product.price,
             subtotal: ci.product.price * ci.quantity

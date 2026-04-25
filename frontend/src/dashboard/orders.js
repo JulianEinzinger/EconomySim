@@ -74,6 +74,7 @@ function normalizeOrder(order, wholesalerNames) {
         totalPrice: Number(order.totalPrice ?? 0),
         paymentStatus: normalizePaymentStatus(order.paymentStatus),
         deliveryStatus: normalizeDeliveryStatus(order.deliveryStatus),
+        paymentDate: parseDate(order.paymentDate),
         items: Array.isArray(order.items) ? order.items.map(i => normalizeItem(i)) : null
     };
 }
@@ -147,6 +148,22 @@ function formatDate(date) {
         hour: "2-digit",
         minute: "2-digit"
     }).format(date);
+}
+
+function formatDay(date) {
+    if(!date) {
+        return "Not scheduled"
+    }
+
+    return new Intl.DateTimeFormat("de-AT", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    }).format(date);
+}
+
+function getTime(date) {
+    return date ? date.getTime() : 0;
 }
 
 function getFilteredOrders() {
@@ -304,7 +321,7 @@ async function renderDetails() {
         detailField('Total', formatCurrency(order.totalPrice)),
         detailField('Ordered on', formatDate(order.orderDate)),
         detailField('Delivery date', formatDate(order.deliveryDate)),
-        detailField('Payment status', badgeHtml(order.paymentStatus)),
+        detailField('Payment status', `${badgeHtml(order.paymentStatus)}${order.paymentStatus==='PAID' ? ` - ${formatDay(order.paymentDate)}` : ''}`),
         detailField('Delivery status', badgeHtml(order.deliveryStatus))
     ].join("");
 

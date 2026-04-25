@@ -152,7 +152,7 @@ function formatDate(date) {
 function getFilteredOrders() {
     const search = searchInput.value.trim().toLowerCase();
     const payment = paymentFilter.value;
-    const delivery = paymentFilter.value;
+    const delivery = deliveryFilter.value;
     const sort = sortSelect.value;
 
     const filtered = state.orders.filter(order => {

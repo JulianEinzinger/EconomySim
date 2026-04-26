@@ -199,3 +199,23 @@ export type WholesalerProduct = Product & {
     max_order_stacks: number,
     category_img_url: string
 }
+
+export type Mail = {
+    id: number,
+    recipientId: number,
+    subject: string,
+    content: string,
+    isRead: boolean,
+    createdAt: Date,
+    archivedAt: Date | null
+}
+
+export type MailRow = {
+    ID: number,
+    RECIPIENT_ID: number,
+    SUBJECT: string,
+    CONTENT: string,
+    IS_READ: boolean,
+    CREATED_AT: Date,
+    ARCHIVED_AT: Date | null
+}

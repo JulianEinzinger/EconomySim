@@ -8,6 +8,7 @@ import { itemRouter } from "./router/itemRouter.js";
 import { devRouter } from "./router/devRouter.js";
 import { wholesalerRouter } from "./router/wholesalerRouter.js";
 import { orderRouter } from "./router/orderRouter.js";
+import { WholesalerSevice } from "./services/wholesalerService.js";
 
 
 const PORT = 3000;
@@ -30,3 +31,22 @@ app.use(express.static("resources"))
 
 app.listen(PORT, () => console.log(`Server listening on: http://localhost:${PORT}`)
 );
+
+const wholesalerService: WholesalerSevice = new WholesalerSevice();
+
+// Game Loop
+// every minute
+const gameLoop = async () => {
+    try {
+        // check for overdue orders and update their status
+        await wholesalerService.processOverdueOrders();
+        // check delivery times and update order status if necessary
+        await wholesalerService.processDeliveredOrders();
+    } catch (error) {
+        
+    }
+
+    setTimeout(gameLoop, 60000);
+};
+
+gameLoop();

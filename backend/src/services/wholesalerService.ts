@@ -1,5 +1,5 @@
 import oracledb, { type Connection, type Result } from "oracledb";
-const { BIND_OUT, NUMBER } = oracledb;
+const { BIND_OUT, NUMBER, BIND_IN } = oracledb;
 import { DeliveryStatus, PaymentStatus, type Wholesaler, type WholesalerOrder, type WholesalerOrderItem, type WholesalerOrderItemRow, type WholesalerOrderRow, type WholesalerProduct, type WholesalerRow } from "@economysim/shared";
 import { getDBConnection } from "../data.js";
 
@@ -504,5 +504,95 @@ FROM es_wholesalers w
 
     private toRadians(degrees: number): number {
         return degrees * Math.PI / 180;
+    }
+
+    /**
+     * Checks for orders that are overdue (payment pending for more than 3 days) and updates their payment status to overdue.
+     */
+    async processOverdueOrders(): Promise<void> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result = await connection.execute(`UPDATE es_wholesaler_orders SET payment_status = :overdue_status WHERE payment_status = :pending_status AND order_date <= :overdue_date`, {
+                overdue_status: PaymentStatus.OVERDUE,
+                pending_status: PaymentStatus.PENDING,
+                overdue_date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3) // orders that are older than 3 days and still pending are considered overdue
+            });
+
+            await connection.commit();
+            await connection.close();
+
+            
+            if(result.rowsAffected) {
+                console.log(`Processed overdue orders, updated ${result.rowsAffected} order${result.rowsAffected > 1 ? 's' : ''} to overdue status.`);
+            }
+        } catch (err) {
+            console.error(`Something happened while trying to process overdue orders: ${err}`);
+        }
+    }
+
+    /**
+     * Checks for orders that should be delivered (delivery date has passed) and updates their delivery status to delivered.
+     */
+    async processDeliveredOrders(): Promise<void> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            // alle IDs der zu liefernden Ordes holen
+            const affectedOrdersResult = await connection.execute<{ ID: number }>(`SELECT id FROM es_wholesaler_orders WHERE delivery_date < :current_date
+                AND delivery_status = :transit_status`, {
+                    current_date: new Date,
+                    transit_status: DeliveryStatus.IN_TRANSIT
+                }
+            );
+
+            const deliveredOrderIds = (affectedOrdersResult.rows ?? []).map(r => r.ID);
+
+            if(deliveredOrderIds.length === 0) {
+                await connection.close();
+                return;
+            }
+
+            // Status updaten
+            const updateResult: Result<{id: number[]}> = await connection.execute(`UPDATE es_wholesaler_orders SET delivery_status = :delivered_status WHERE id IN (${deliveredOrderIds.map((_, i) => `:id${i}`).join(',')})`, {
+                delivered_status: DeliveryStatus.DELIVERED,
+                ...Object.fromEntries(deliveredOrderIds.map((id, i) => [`id${i}`, id]))
+            });
+
+            console.log(`Updated ${updateResult.rowsAffected} order(s) to delivered.`);
+
+            // move items to warehouse
+
+            await connection.execute(`
+                MERGE INTO es_warehouse_items wi
+                USING (
+                    SELECT
+                        w.id AS warehouse_id,
+                        oi.product_id,
+                        oi.quantity
+                    FROM es_wholesaler_orders o
+                    JOIN es_wholesaler_order_items oi ON o.id = oi.order_id
+                    JOIN es_warehouses w ON o.company_id = w.company_id
+                    WHERE o.id IN (${deliveredOrderIds.map((_, i) => `:id${i}`).join(',')})
+                    AND w.id = (
+                        SELECT MIN(w2.id) 
+                        FROM es_warehouses w2
+                        WHERE w2.company_id = o.company_id
+                    )
+                ) src ON (wi.warehouse_id = src.warehouse_id AND wi.product_id = src.product_id)    
+                WHEN MATCHED THEN
+                    UPDATE SET wi.quantity = wi.quantity + src.quantity
+                WHEN NOT MATCHED THEN
+                    INSERT (warehouse_id, product_id, quantity)
+                    VALUES (src.warehouse_id, src.product_id, src.quantity)`,
+                Object.fromEntries(deliveredOrderIds.map((id, i) => [`id${i}`, id]))
+            );
+
+            await connection.commit();
+            await connection.close();
+
+        } catch (err) {
+            console.error(`Something happened while trying to process delivered orders: ${err}`);
+        }
     }
 }

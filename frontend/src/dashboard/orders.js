@@ -473,12 +473,12 @@ async function loadBankAccounts() {
         throw new Error('Account loading Not Yet Implemented!');
     } catch {
         // Fallback-Data for development
-        /*
+        
         return [
             { id: 1, name: "Main Business Account", iban: 'AT12 3456 7890 1234 5678', balance: 14350 },
             { id: 2, name: "Operations Account", iban: 'AT98 7654 3210 9876 5432', balance: 26 }
         ];
-        */
+        
        return [];
     }
 }
@@ -531,8 +531,8 @@ modalConfirmBtn.addEventListener("click", async () => {
     modalConfirmBtn.innerHTML = `<span class="material-icons-outlined">hourglass_top</span> Processing...`;
 
     try {
-        const response = await fetch(`http://localhost:3000/...`, { // TODO implement paying order
-            method: 'TODO',
+        const response = await fetch(`http://localhost:3000/orders/${order.id}/pay`, { // TODO implement paying order
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -548,6 +548,7 @@ modalConfirmBtn.addEventListener("click", async () => {
 
         closeModal();
         renderOrders();
+        renderDetails();
     } catch {
         modalConfirmBtn.disabled = false;
         modalConfirmBtn.innerHTML = `<span class="material-icons-outlined>check_circle</span> Confirm payment`;

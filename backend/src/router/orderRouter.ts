@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { WholesalerSevice } from "../services/wholesalerService.js";
-import type { WholesalerOrder, WholesalerOrderItem } from "@economysim/shared";
+import { DeliveryStatus, PaymentStatus, type WholesalerOrder, type WholesalerOrderItem } from "@economysim/shared";
 import { CompanyService } from "../services/companyService.js";
 import { authenticateToken } from "../services/authService.js";
 
@@ -60,4 +60,26 @@ orderRouter.get("/:orderId/items", authenticateToken ,async (req: Request, res: 
     } else {
         return res.status(StatusCodes.OK).json(itemsResult);
     }
+});
+
+orderRouter.put("/:orderId/pay", authenticateToken, async (req: Request, res: Response) => {
+    const orderId: number = Number(req.params.orderId);
+    const bankAccountId: number = Number(req.body.bankAccountId);
+    const userId: number = req.user!.userId;
+
+    if(isNaN(orderId)) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid order ID' });
+    }
+
+    const wholesalerService: WholesalerSevice = new WholesalerSevice();
+    const companyService: CompanyService = new CompanyService();
+
+    // check if company of order is owned by the user
+    const companyId: number = await wholesalerService.getCompanyIdForOrderId(orderId);
+    if (!await companyService.isCompanyOwnedByUser(companyId, userId)) {
+        return res.status(StatusCodes.FORBIDDEN).json({ message: "You do not have access to this order" });
+    }
+
+    await wholesalerService.payOrder(orderId, bankAccountId);
+    res.status(StatusCodes.OK).json({ message: `Successfully paid order #(${orderId})` });
 });

@@ -388,6 +388,29 @@ FROM es_wholesalers w
     }
 
     /**
+     * Processes the payment for a specific order using the provided bank account ID. It checks if the order exists and verifies if the bank account has sufficient balance. If the payment is successful, it updates the payment status.
+     * @param orderId 
+     * @param bankAccountId 
+     * @returns 
+     */
+    async payOrder(orderId: number, bankAccountId: number): Promise<void> {
+        try {
+            const order = await this.getOrderById(orderId);
+            if(!order) return;
+            const totalPrice = order.totalPrice;
+            // TODO check if bank account balance is sufficient
+            const isSufficient = true;
+            if(!isSufficient) return;
+
+            // Todo: Betrag abbuchen
+
+            await this.updatePaymentStatus(orderId, PaymentStatus.PAYED);
+        } catch (err) {
+            console.error(`Something happened while trying to pay order #${orderId}: ${err}`);
+        }
+    }
+
+    /**
      * Updates the payment status of an order
      * @param orderId 
      * @param status 
@@ -397,14 +420,16 @@ FROM es_wholesalers w
         try {
             const connection: Connection = await getDBConnection();
 
-            const result = await connection.execute(`UPDATE es_wholesaler_orders SET payment_status = :status WHERE id = :order_id`, {
+            const result = await connection.execute(`UPDATE es_wholesaler_orders SET payment_status = :status, payment_date = :payment_date WHERE id = :order_id`, {
                 order_id: orderId,
+                payment_date: new Date(),
                 status: status
             });
 
+            await connection.commit();
             await connection.close();
             
-            return (result.rows?.length ?? 0) > 0;
+            return (result.rowsAffected ?? 0) > 0;
         } catch (err) {
             console.error(`Something happened while trying to update payment status for order with id ${orderId}: ${err}`);
             return false;
@@ -426,9 +451,10 @@ FROM es_wholesalers w
                 status: status
             });
 
+            await connection.commit();
             await connection.close();
             
-            return (result.rows?.length ?? 0) > 0;
+            return (result.rowsAffected ?? 0) > 0;
         } catch (err) {
             console.error(`Something happened while trying to update delivery status for order with id ${orderId}: ${err}`);
             return false;

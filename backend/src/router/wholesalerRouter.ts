@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { WholesalerSevice } from "../services/wholesalerService.js";
+import { WholesalerService } from "../services/wholesalerService.js";
 import type { Wholesaler, WholesalerOrderItem } from "@economysim/shared";
 import { StatusCodes } from "http-status-codes";
 import { authenticateToken } from "../services/authService.js";
@@ -8,7 +8,7 @@ import { CompanyService } from "../services/companyService.js";
 export const wholesalerRouter = Router();
 
 wholesalerRouter.get("/", async (req: Request, res: Response) => {
-    const service: WholesalerSevice = new WholesalerSevice();
+    const service: WholesalerService = new WholesalerService();
 
     const wholesalers: Wholesaler[] | null = await service.getAllWholesalers();
 
@@ -28,7 +28,7 @@ wholesalerRouter.post("/purchase", authenticateToken, async (req: Request, res: 
         return res.status(StatusCodes.FORBIDDEN).json({ message: "You do not have access to this company!" });
     }
 
-    const service: WholesalerSevice = new WholesalerSevice();
+    const service: WholesalerService = new WholesalerService();
     
     const result = await service.createOrder(companyId, wholesalerId, items);
 

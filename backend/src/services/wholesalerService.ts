@@ -3,7 +3,7 @@ const { BIND_OUT, NUMBER, BIND_IN } = oracledb;
 import { DeliveryStatus, PaymentStatus, type Wholesaler, type WholesalerOrder, type WholesalerOrderItem, type WholesalerOrderItemRow, type WholesalerOrderRow, type WholesalerProduct, type WholesalerRow } from "@economysim/shared";
 import { getDBConnection } from "../data.js";
 
-export class WholesalerSevice {
+export class WholesalerService {
 
     /**
      * 

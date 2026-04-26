@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { WholesalerSevice } from "../services/wholesalerService.js";
+import { WholesalerService } from "../services/wholesalerService.js";
 import { DeliveryStatus, PaymentStatus, type WholesalerOrder, type WholesalerOrderItem } from "@economysim/shared";
 import { CompanyService } from "../services/companyService.js";
 import { authenticateToken } from "../services/authService.js";
@@ -15,7 +15,7 @@ orderRouter.get("/", authenticateToken, async (req: Request, res: Response) => {
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid company ID' });
     }
 
-    const wholesalerService: WholesalerSevice = new WholesalerSevice();
+    const wholesalerService: WholesalerService = new WholesalerService();
     const companyService: CompanyService = new CompanyService();
 
     // check if the company belongs to the user
@@ -40,7 +40,7 @@ orderRouter.get("/:orderId/items", authenticateToken ,async (req: Request, res: 
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid order ID' });
     }
 
-    const wholesalerService: WholesalerSevice = new WholesalerSevice();
+    const wholesalerService: WholesalerService = new WholesalerService();
     const companyService: CompanyService = new CompanyService();
 
     // check if company of order is owned by the user
@@ -71,7 +71,7 @@ orderRouter.put("/:orderId/pay", authenticateToken, async (req: Request, res: Re
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid order ID' });
     }
 
-    const wholesalerService: WholesalerSevice = new WholesalerSevice();
+    const wholesalerService: WholesalerService = new WholesalerService();
     const companyService: CompanyService = new CompanyService();
 
     // check if company of order is owned by the user

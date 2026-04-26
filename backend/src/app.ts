@@ -8,7 +8,7 @@ import { itemRouter } from "./router/itemRouter.js";
 import { devRouter } from "./router/devRouter.js";
 import { wholesalerRouter } from "./router/wholesalerRouter.js";
 import { orderRouter } from "./router/orderRouter.js";
-import { WholesalerSevice } from "./services/wholesalerService.js";
+import { WholesalerService } from "./services/wholesalerService.js";
 
 
 const PORT = 3000;
@@ -32,7 +32,7 @@ app.use(express.static("resources"))
 app.listen(PORT, () => console.log(`Server listening on: http://localhost:${PORT}`)
 );
 
-const wholesalerService: WholesalerSevice = new WholesalerSevice();
+const wholesalerService: WholesalerService = new WholesalerService();
 
 // Game Loop
 // every minute

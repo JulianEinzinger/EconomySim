@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mails</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <link rel="stylesheet" href="mails.css">
+</head>
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+            <div class="header-left">
+                <!-- Could be added a search bar here in the future -->
+            </div>
+            <div class="header-right">
+                <span class="material-icons-outlined">notifications</span>
+                <span class="material-icons-outlined">mail</span>
+                <span class="material-icons-outlined">account_circle</span>
+            </div>
+        </header>
+
+        <aside id="sidebar">
+            <div class="sidebar-title">
+                <div class="sidebar-logo">
+                    <span class="material-icons-outlined">inventory</span>
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <div class="balance-display">
+                <span class="material-icons-outlined">account_balance_wallet</span>
+            </div>
+
+            <ul class="sidebar-list">
+                <li>
+                    <a href="dashboard.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">dashboard</span> Dashboard
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="inventory.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">warehouse</span> Inventory
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="economics.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">analytics</span> Economics
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="purchase.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">add_shopping_cart</span> Purchase
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="orders.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">receipt_long</span> Orders
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="settings.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">settings</span> Settings
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="mails.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">mail</span> Mails
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-container">
+            <div class="main-title">
+                <div>
+                    <p class="font-weight-bold">MAILS</p>
+                    <span class="subtitle">Manage incoming emails and keep every conversation organized in one place.</span>
+                </div>
+            </div>
+
+            <section class="summary-grid" id="summary-grid"></section>
+
+            <section class="panel controls-panel">
+                <div class="controls-row">
+                    <label class="control">
+                        <span>Search</span>
+                        <input id="search-input" type="search" placeholder="Mail subject or content">
+                    </label>
+                    <label class="control">
+                        <span>Sorty by</span>
+                        <select id="sort-select">
+                            <option value="DATE_DESC">Newest first</option>
+                            <option value="DATE_ASC">Oldest first</option>
+                        </select>
+                    </label>
+                </div>
+            </section>
+
+            <section class="content-grid">
+                <div class="panel table-panel">
+                    <table class="mails-table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Archive</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mails-body"></tbody>
+                    </table>
+                    <div class="empty-state hidden"  id="empty-state">
+                        <span class="material-icons-outlined">mail</span>
+                        <p>No mails match the current filters.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+  
+        <!-- Payment Modal -->
+         <div class="modal-backdrop hidden" id="pay-modal-backdrop">
+            <div class="modal" id="pay-modal">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="modal-title">Confirm Payment</h2>
+                        <p id="modal-subtitle"></p>
+                    </div>
+                    <button class="modal-close-btn" id="modal-close-btn">
+                        <span class="material-icons-outlined">close</span>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <p class="modal-label">Select bank account</p>
+                    <div class="account-list" id="account-list">
+                        <div class="account-skeleton"></div>
+                        <div class="account-skeleton"></div>
+                    </div>
+
+                    <div class="modal-summary" id="modal-summary">
+                        <span>Total due</span>
+                        <strong id="modal-total"></strong>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="modal-cancel-btn">Cancel</button>
+                    <button class="btn-primary" id="modal-confirm-btn" disabled>
+                        <span class="material-icons-outlined">check_circle</span>
+                        Confirm payment
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    <script src="mails.js" type="module"></script>
+    <script src="sidebar.js" type="module"></script>
+</body>
+</html>

@@ -63,3 +63,18 @@ Authorization: Bearer dev123
     "productCategoryId": 2,
     "unit": "Stk"
 }
+
+###
+
+GET {{baseUrl}}/mails?companyId=3
+Authorization: Bearer {{token}}
+
+###
+
+GET {{baseUrl}}/mails/1
+Authorization: Bearer {{token}}
+
+###
+
+POST {{baseUrl}}/mails/1/archive
+Authorization: Bearer {{token}}

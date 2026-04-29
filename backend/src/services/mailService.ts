@@ -2,6 +2,8 @@ import type { Mail, MailRow } from "@economysim/shared";
 import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER } = oracledb;
 import { getDBConnection } from "../data.js";
+import fs from "fs";
+import Handlebars from "handlebars";
 
 oracledb.fetchAsString = [oracledb.CLOB];
 
@@ -129,9 +131,11 @@ export class MailService {
      * @param subject 
      * @param content 
      * @returns the mail id of the newly created mail, or -1 if failed
+     * @deprecated NOT FUNCTIONAL AT THE MOMENT!!!
      */  
-    async createMail(companyId: number, subject: string, content: string): Promise<number> {
+    async createMail<T extends keyof MailTemplates>(companyId: number, template: T, data: MailTemplates[T]): Promise<number> {
         try {
+            /*
             const connection: Connection = await getDBConnection();
 
             const result: Result<{id: number[]}> = await connection.execute(`INSERT INTO es_mails (recipient_id, subject, content, created_at)
@@ -157,9 +161,32 @@ export class MailService {
             await connection.close();
 
             return mailId;
+            */
+           return -1; // TODO fix createMail()
         } catch (err) {
             console.error(`Something happened while trying to create a mail: ${err}`);
             return -1;
         }
     }
+
+    
+
+    renderTemplate(templateName: string, data: any) {
+        const file = fs.readFileSync(`backend/templates/${templateName}.hbs`, "utf-8");
+
+        const template = Handlebars.compile(file);
+        return template(data);
+    }
 }
+
+export type MailTemplate_OrderConfirmationData = {
+    wholesalerName: string,
+    companyName: string,
+    orderId: number,
+    products: [] // TODO change to real orderItem Array,
+    totalPrice: number
+};
+
+export type MailTemplates = {
+    "order-confirmation": MailTemplate_OrderConfirmationData;
+};

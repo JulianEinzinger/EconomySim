@@ -66,6 +66,14 @@ Authorization: Bearer dev123
 
 ###
 
+GET {{baseUrl}}/dev/delivery-date
+Content-Type: application/json
+Authorization: Bearer dev123
+
+{
+    "wholesalerId": 1,
+    "companyId": 3
+}
 GET {{baseUrl}}/mails?companyId=3
 Authorization: Bearer {{token}}
 

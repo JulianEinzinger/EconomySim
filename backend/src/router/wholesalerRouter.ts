@@ -1,12 +1,14 @@
 import { Router, type Request, type Response } from "express";
-import { WholesalerSevice } from "../services/wholesalerService.js";
-import type { Wholesaler } from "@economysim/shared";
+import { WholesalerService } from "../services/wholesalerService.js";
+import type { Wholesaler, WholesalerOrderItem } from "@economysim/shared";
 import { StatusCodes } from "http-status-codes";
+import { authenticateToken } from "../services/authService.js";
+import { CompanyService } from "../services/companyService.js";
 
 export const wholesalerRouter = Router();
 
 wholesalerRouter.get("/", async (req: Request, res: Response) => {
-    const service: WholesalerSevice = new WholesalerSevice();
+    const service: WholesalerService = new WholesalerService();
 
     const wholesalers: Wholesaler[] | null = await service.getAllWholesalers();
 
@@ -17,16 +19,22 @@ wholesalerRouter.get("/", async (req: Request, res: Response) => {
     }
 });
 
-wholesalerRouter.post("/purchase", async (req: Request, res: Response) => {
-    const [wholesalerId, items]: [ number, { productId: number, quantity: number }[]] = req.body;
+wholesalerRouter.post("/purchase", authenticateToken, async (req: Request, res: Response) => {
+    const { companyId, wholesalerId, items }: { companyId:number, wholesalerId: number, items: WholesalerOrderItem[] } = req.body;
+    const userId: number = req.user!.userId;
 
-    const service: WholesalerSevice = new WholesalerSevice();
+    const companyService: CompanyService = new CompanyService();
+    if(!await companyService.isCompanyOwnedByUser(companyId, userId)) {
+        return res.status(StatusCodes.FORBIDDEN).json({ message: "You do not have access to this company!" });
+    }
+
+    const service: WholesalerService = new WholesalerService();
     
-    const success: boolean = await service.purchaseFromWholesaler(wholesalerId, items);
+    const result = await service.createOrder(companyId, wholesalerId, items);
 
-    if(success) {
-        res.status(StatusCodes.OK).json({ message: 'Purchase successful' });
+    if(result.success) {
+        res.status(StatusCodes.OK).json({ message: `Purchase successful! (${result.orderId})` });
     } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error processing purchase' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error processing purchase!' });
     }
 });

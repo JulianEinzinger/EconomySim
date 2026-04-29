@@ -200,6 +200,68 @@ export type WholesalerProduct = Product & {
     category_img_url: string
 }
 
+export enum PaymentStatus {
+    PENDING = 'Pending',
+    PAYED = 'Payed',
+    OVERDUE = 'Overdue'
+}
+
+export enum DeliveryStatus {
+    IN_TRANSIT = 'In Transit',
+    DELIVERED = 'Delivered'
+}
+
+export type WholesalerOrder = {
+    id: number,
+    companyId: number,
+    wholesalerId: number,
+    orderDate: Date,
+    deliveryDate: Date,
+    paymentDate: Date,
+    totalPrice: number,
+    paymentStatus: PaymentStatus,
+    deliveryStatus: DeliveryStatus,
+    items: WholesalerOrderItem[]
+}
+
+export type WholesalerOrderRow = {
+    O_ID: number,
+    COMPANY_ID: number,
+    WHOLESALER_ID: number,
+    ORDER_DATE: Date,
+    DELIVERY_DATE: Date,
+    PAYMENT_DATE: Date,
+    TOTAL_PRICE: number,
+    PAYMENT_STATUS: PaymentStatus,
+    DELIVERY_STATUS: DeliveryStatus,
+    I_ID: number,
+    PRODUCT_ID: number,
+    PRODUCT_NAME: string,
+    QUANTITY: number,
+    PRICE_PER_UNIT: number,
+    SUBTOTAL: number
+}
+
+export type WholesalerOrderItem = {
+    id: number,
+    orderId: number,
+    productName: string,
+    productId: number,
+    quantity: number,
+    pricePerUnit: number,
+    subtotal: number
+}
+
+export type WholesalerOrderItemRow = {
+    ID: number,
+    ORDER_ID: number,
+    PRODUCT_NAME: string,
+    PRODUCT_ID: number,
+    QUANTITY: number,
+    PRICE_PER_UNIT: number,
+    SUBTOTAL: number
+}
+
 export type Mail = {
     id: number,
     recipientId: number,

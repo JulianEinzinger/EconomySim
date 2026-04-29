@@ -3,22 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory</title>
+    <title>Mails</title>
 
-    <!-- Montserrat Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap">
-
-    <!-- Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
-     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
-
-     <!-- Bootstrap -->
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-
-    <link rel="stylesheet" href="purchase.css">
+    <link rel="stylesheet" href="mails.css">
 </head>
 <body>
     <div class="grid-container">
@@ -27,7 +17,7 @@
                 <span class="material-icons-outlined">menu</span>
             </div>
             <div class="header-left">
-                <span class="material-icons-outlined">search</span>
+                <!-- Could be added a search bar here in the future -->
             </div>
             <div class="header-right">
                 <span class="material-icons-outlined">notifications</span>
@@ -103,25 +93,87 @@
 
         <main class="main-container">
             <div class="main-title">
-                <p class="font-weight-bold">PURCHASE</p>
-                <button id="back-button">Back</button>
+                <div>
+                    <p class="font-weight-bold">MAILS</p>
+                    <span class="subtitle">Manage incoming emails and keep every conversation organized in one place.</span>
+                </div>
             </div>
 
-            <div class="main-cards">
-            </div>
+            <section class="summary-grid" id="summary-grid"></section>
 
-            <div id="cart-panel" class="cart-panel">
-                <h4>Shopping cart</h4>
-                <div id="cart-groups"></div>
-            </div>
+            <section class="panel controls-panel">
+                <div class="controls-row">
+                    <label class="control">
+                        <span>Search</span>
+                        <input id="search-input" type="search" placeholder="Mail subject or content">
+                    </label>
+                    <label class="control">
+                        <span>Sorty by</span>
+                        <select id="sort-select">
+                            <option value="DATE_DESC">Newest first</option>
+                            <option value="DATE_ASC">Oldest first</option>
+                        </select>
+                    </label>
+                </div>
+            </section>
+
+            <section class="content-grid">
+                <div class="panel table-panel">
+                    <table class="mails-table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Archive</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mails-body"></tbody>
+                    </table>
+                    <div class="empty-state hidden"  id="empty-state">
+                        <span class="material-icons-outlined">mail</span>
+                        <p>No mails match the current filters.</p>
+                    </div>
+                </div>
+            </section>
         </main>
-    </div>
+  
+        <!-- Payment Modal -->
+         <div class="modal-backdrop hidden" id="pay-modal-backdrop">
+            <div class="modal" id="pay-modal">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="modal-title">Confirm Payment</h2>
+                        <p id="modal-subtitle"></p>
+                    </div>
+                    <button class="modal-close-btn" id="modal-close-btn">
+                        <span class="material-icons-outlined">close</span>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <p class="modal-label">Select bank account</p>
+                    <div class="account-list" id="account-list">
+                        <div class="account-skeleton"></div>
+                        <div class="account-skeleton"></div>
+                    </div>
 
-    <script src="purchase.js" type="module"></script>
+                    <div class="modal-summary" id="modal-summary">
+                        <span>Total due</span>
+                        <strong id="modal-total"></strong>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="modal-cancel-btn">Cancel</button>
+                    <button class="btn-primary" id="modal-confirm-btn" disabled>
+                        <span class="material-icons-outlined">check_circle</span>
+                        Confirm payment
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    <script src="mails.js" type="module"></script>
     <script src="sidebar.js" type="module"></script>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
 </body>
 </html>

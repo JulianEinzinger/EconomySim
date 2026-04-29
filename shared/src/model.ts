@@ -261,3 +261,23 @@ export type WholesalerOrderItemRow = {
     PRICE_PER_UNIT: number,
     SUBTOTAL: number
 }
+
+export type Mail = {
+    id: number,
+    recipientId: number,
+    subject: string,
+    content: string,
+    isRead: boolean,
+    createdAt: Date,
+    archivedAt: Date | null
+}
+
+export type MailRow = {
+    ID: number,
+    RECIPIENT_ID: number,
+    SUBJECT: string,
+    CONTENT: string,
+    IS_READ: boolean,
+    CREATED_AT: Date,
+    ARCHIVED_AT: Date | null
+}

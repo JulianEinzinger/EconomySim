@@ -74,3 +74,15 @@ Authorization: Bearer dev123
     "wholesalerId": 1,
     "companyId": 3
 }
+GET {{baseUrl}}/mails?companyId=3
+Authorization: Bearer {{token}}
+
+###
+
+GET {{baseUrl}}/mails/1
+Authorization: Bearer {{token}}
+
+###
+
+POST {{baseUrl}}/mails/1/archive
+Authorization: Bearer {{token}}

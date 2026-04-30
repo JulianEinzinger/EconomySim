@@ -1,4 +1,4 @@
-import type { Mail, MailRow } from "@economysim/shared";
+import type { Mail, MailRow, WholesalerOrderItem } from "@economysim/shared";
 import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER } = oracledb;
 import { getDBConnection } from "../data.js";
@@ -133,11 +133,11 @@ export class MailService {
      * @param subject 
      * @param content 
      * @returns the mail id of the newly created mail, or -1 if failed
-     * @deprecated NOT FUNCTIONAL AT THE MOMENT!!!
      */  
-    async createMail<T extends keyof MailTemplates>(companyId: number, template: T, data: MailTemplates[T]): Promise<number> {
+    async createMail<T extends keyof MailTemplates>(companyId: number, sender: string, subject: string, template: T, data: MailTemplates[T]): Promise<number> {
+        const html = this.renderTemplate(template, data);
+
         try {
-            /*
             const connection: Connection = await getDBConnection();
 
             const result: Result<{id: number[]}> = await connection.execute(`INSERT INTO es_mails (recipient_id, sender, subject, content, created_at)
@@ -145,7 +145,7 @@ export class MailService {
                     companyId,
                     sender,
                     subject,
-                    content,
+                    content: html,
                     created_date: new Date(),
                     id: { dir: BIND_OUT, type: NUMBER }
             });
@@ -173,8 +173,8 @@ export class MailService {
 
     
 
-    renderTemplate(templateName: string, data: any) {
-        const file = fs.readFileSync(`backend/templates/${templateName}.hbs`, "utf-8");
+    renderTemplate(templateName: string, data: MailTemplates[keyof MailTemplates]): string {
+        const file = fs.readFileSync(`mail_templates/${templateName}.hbs`, "utf-8");
 
         const template = Handlebars.compile(file);
         return template(data);
@@ -185,10 +185,20 @@ export type MailTemplate_OrderConfirmationData = {
     wholesalerName: string,
     companyName: string,
     orderId: number,
-    products: [] // TODO change to real orderItem Array,
+    products: WholesalerOrderItem[],
     totalPrice: number
 };
 
+export type MailTemplate_InstallmentReminderData = {
+    bankName: string,
+    wholesalerName: string,
+    loanNumber: string,
+    dueDate: string,
+    installmentAmount: number,
+    bankIban: string
+}
+
 export type MailTemplates = {
     "order-confirmation": MailTemplate_OrderConfirmationData;
+    "installment-reminder": MailTemplate_InstallmentReminderData;
 };

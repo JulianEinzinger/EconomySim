@@ -8,6 +8,17 @@ import Handlebars from "handlebars";
 oracledb.fetchAsString = [oracledb.CLOB];
 
 export class MailService {
+
+    static formatDate(date: Date): string {
+        return new Intl.DateTimeFormat("de-AT", {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(date);
+    }
+
     /**
      * Retrieves all mails for a company
      * @param companyId 

@@ -265,6 +265,7 @@ export type WholesalerOrderItemRow = {
 export type Mail = {
     id: number,
     recipientId: number,
+    sender: string,
     subject: string,
     content: string,
     isRead: boolean,
@@ -275,6 +276,7 @@ export type Mail = {
 export type MailRow = {
     ID: number,
     RECIPIENT_ID: number,
+    SENDER: string,
     SUBJECT: string,
     CONTENT: string,
     IS_READ: boolean,

@@ -25,6 +25,7 @@ export class MailService {
             return result.map(mr => ({
                 id: mr.ID,
                 recipientId: mr.RECIPIENT_ID,
+                sender: mr.SENDER,
                 subject: mr.SUBJECT,
                 content: mr.CONTENT,
                 isRead: mr.IS_READ,
@@ -59,6 +60,7 @@ export class MailService {
                 return {
                     id: mail.ID,
                     recipientId: mail.RECIPIENT_ID,
+                    sender: mail.SENDER,
                     subject: mail.SUBJECT,
                     content: mail.CONTENT,
                     isRead: mail.IS_READ,
@@ -138,9 +140,10 @@ export class MailService {
             /*
             const connection: Connection = await getDBConnection();
 
-            const result: Result<{id: number[]}> = await connection.execute(`INSERT INTO es_mails (recipient_id, subject, content, created_at)
-                VALUES (:companyId, :subject, :content, :created_date) RETURNING id INTO :id`, {
+            const result: Result<{id: number[]}> = await connection.execute(`INSERT INTO es_mails (recipient_id, sender, subject, content, created_at)
+                VALUES (:companyId, :sender, :subject, :content, :created_date) RETURNING id INTO :id`, {
                     companyId,
+                    sender,
                     subject,
                     content,
                     created_date: new Date(),
@@ -161,8 +164,7 @@ export class MailService {
             await connection.close();
 
             return mailId;
-            */
-           return -1; // TODO fix createMail()
+           return -1;
         } catch (err) {
             console.error(`Something happened while trying to create a mail: ${err}`);
             return -1;

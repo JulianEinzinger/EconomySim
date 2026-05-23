@@ -21,6 +21,27 @@ mailRouter.get("/", authenticateToken, async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json(mails);
 });
 
+mailRouter.get("/unread-count", authenticateToken, async (req: Request, res: Response) => {
+    const companyId: number = Number(req.query.companyId);
+    const userId: number = req.user!.userId;
+
+    if(isNaN(companyId)) {
+        res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid company id' });
+    }
+
+    const mailService: MailService = new MailService();
+    const companyService: CompanyService = new CompanyService();
+
+    if(await companyService.isCompanyOwnedByUser(companyId, userId)) {
+        // company gehört user
+        const unreadCount: number = await mailService.getUnreadMailsCountForCompany(companyId);
+
+        res.status(StatusCodes.OK).json({ unreadCount: unreadCount });
+    } else {
+        res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have access to this company\'s mails' });
+    }
+});
+
 mailRouter.get("/:mailId", authenticateToken, async (req: Request, res: Response) => {
     const mailId: number = Number(req.params.mailId);
     const userId: number = req.user!.userId;

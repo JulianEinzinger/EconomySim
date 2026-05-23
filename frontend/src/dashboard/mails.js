@@ -1,3 +1,5 @@
+import { updateUnreadMailCount } from "./sidebar.js";
+
 const mailsBody         = document.getElementById('mails-body');
 const emptyState        = document.getElementById('empty-state');
 
@@ -172,6 +174,8 @@ async function renderDetails() {
                 'Authorization': `Bearer ${token}`
             }
         });
+
+        await updateUnreadMailCount();
 
         if(!result.ok) {
             throw new Error(`Posting to read mail resulted in: ${result.status}`);

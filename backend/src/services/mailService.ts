@@ -164,6 +164,30 @@ export class MailService {
     }
 
     /**
+     * Retrieves the number of unread mails a specific company has
+     * @param companyId 
+     * @returns 
+     */
+    async getUnreadMailsCountForCompany(companyId: number): Promise<number> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result: {COUNT: number}[] = (await connection.execute<{ COUNT: number }>(`SELECT COUNT(*) as count FROM es_mails WHERE recipient_id = :company_id AND is_read = 0`, {
+                company_id: companyId
+            })).rows ?? [];
+
+            if(result.length > 0) {
+                return result[0]!.COUNT;
+            } else {
+                return 0;
+            }
+        } catch (err) {
+            console.error(`Something happened while trying to retrieve unread mails count for company with id ${companyId}: ${err}`);
+            return 0;
+        }
+    }
+
+    /**
      * Creates a new mail
      * @param companyId 
      * @param subject 

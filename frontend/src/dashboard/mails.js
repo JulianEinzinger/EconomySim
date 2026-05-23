@@ -48,7 +48,6 @@ async function handleDeleteMail() {
         throw new Error(`Deleting mail resulted in: ${response.status}`);
     }
 
-    console.log(`Mail with id ${state.selectedMailId} deleted successfully.`);
     // Load mails again to reflect deletion
     await loadMails();
     state.selectedMailId = null;

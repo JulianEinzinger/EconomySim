@@ -714,7 +714,7 @@ a {
     margin-bottom: 0;
 }
 
-.pay-btn {
+.pay-btn, .delete-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -730,8 +730,17 @@ a {
     flex-shrink: 0;
 }
 
-.pay-btn .material-icons-outlined {
+.pay-btn .material-icons-outlined, .delete-btn .material-icons-outlined {
     font-size: 16px;
+}
+
+.delete-btn {
+    background-color: #c23c43;
+    color: #fdfffe;
+}
+
+.delete-btn:hover {
+    background-color: #c74d55;
 }
 
 /* Pending → gleiche Farbe wie .status-badge.paid */

@@ -139,6 +139,31 @@ export class MailService {
     }
 
     /**
+     * Deletes a mail
+     * @param mailId 
+     * @param companyId 
+     * @returns 
+     */
+    async deleteMail(mailId: number, companyId: number): Promise<boolean> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result: number = (await connection.execute(`DELETE FROM es_mails WHERE id = :mail_id AND recipient_id = :company_id`, {
+                mail_id: mailId,
+                company_id: companyId
+            })).rowsAffected ?? 0;
+
+            await connection.commit();
+            await connection.close();
+
+            return !!result;
+        } catch (err) {
+            console.error(`Something happened while trying to delete mail with id ${mailId}: ${err}`);
+            return false;
+        }
+    }
+
+    /**
      * Creates a new mail
      * @param companyId 
      * @param subject 

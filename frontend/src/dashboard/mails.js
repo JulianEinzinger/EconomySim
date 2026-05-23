@@ -11,6 +11,10 @@ const searchInput       = document.getElementById('search-input');
 const statusFilter      = document.getElementById('status-filter');
 const sortSelect        = document.getElementById('sort-select');
 
+const deleteBtn         = document.getElementById('delete-btn');
+
+deleteBtn.addEventListener("click", handleDeleteMail);
+
 const state = {
     mails: [],
     selectedMailId: null
@@ -24,6 +28,31 @@ state.mails = [
     { id: 1, sender: 'METRO AG', subject: 'Order confirmation #12345', content: ``, date: new Date(), status: 'UNREAD' },
     { id: 2, sender: 'Bank Austria', subject: 'Zahlungserinnerung', content: ``, date: new Date(), status: 'READ' },
 ];
+
+async function handleDeleteMail() {
+    const mail = state.mails.find(m => m.id === state.selectedMailId);
+    if (!mail) return;
+
+    console.log('Deleting mail with id:', state.selectedMailId);
+    const response = await fetch(`http://localhost:3000/mails/${state.selectedMailId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Deleting mail resulted in: ${response.status}`);
+    }
+
+    console.log(`Mail with id ${state.selectedMailId} deleted successfully.`);
+    // Load mails again to reflect deletion
+    await loadMails();
+    state.selectedMailId = null;
+    renderMails();
+    renderDetails();
+}
 
 async function loadMails() {
     const response = await fetch(`http://localhost:3000/mails?companyId=${companyId}`, {
@@ -134,19 +163,23 @@ async function renderDetails() {
     mailMeta.textContent = `${mail.sender} • ${formatDate(mail.date)}`;
     mailBody.innerHTML = mail.content;
 
-    mail.status = 'READ'; // TODO fetch API for reading mail
-    const result = await fetch(`http://localhost:3000/mails/${state.selectedMailId}/read`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-        
-    });
+    if(mail.status != 'READ') {
+        mail.status = 'READ';
+        const result = await fetch(`http://localhost:3000/mails/${state.selectedMailId}/read`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
 
-    if(!result.ok) {
-        throw new Error(`Posting to read mail resulted in: ${result.status}`);
+        if(!result.ok) {
+            throw new Error(`Posting to read mail resulted in: ${result.status}`);
+        }
     }
+
+    // Delete Button
+    deleteBtn.classList.remove('hidden');
 }
 
 [searchInput, statusFilter, sortSelect].forEach(element => {

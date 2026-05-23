@@ -105,3 +105,33 @@ mailRouter.post("/:mailId/archive", authenticateToken, async (req: Request, res:
         }
     }
 });
+
+mailRouter.delete("/:mailId", authenticateToken, async (req: Request, res: Response) => {
+    const mailId: number = Number(req.params.mailId);
+    const userId: number = req.user!.userId;
+
+    if(isNaN(mailId)) {
+        res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid mail id' });
+    }
+
+    const mailService: MailService = new MailService();
+    const companyService: CompanyService = new CompanyService();
+
+    const mail: Mail | null = await mailService.getMailById(mailId);
+
+    if(!mail) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Mail not found' });
+    } else {
+        if (await companyService.isCompanyOwnedByUser(mail.recipientId, userId)) {
+            // company von mail gehört user
+            const result = await mailService.deleteMail(mailId, mail.recipientId);
+            if(result) {
+                res.status(StatusCodes.NO_CONTENT).json({});
+            } else {
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Something went wrong!' });
+            }
+        } else {
+            res.status(StatusCodes.FORBIDDEN).json({ message: 'You do not have access to this mail' });
+        }
+    }
+});

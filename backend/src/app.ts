@@ -60,7 +60,7 @@ const gameLoop = async () => {
         // check delivery times and update order status if necessary
         await wholesalerService.processDeliveredOrders();
     } catch (error) {
-        
+        console.error(`Game loop failed: ${error}`);
     }
 
     setTimeout(gameLoop, 60000);

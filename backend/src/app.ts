@@ -11,6 +11,7 @@ import { orderRouter } from "./router/orderRouter.js";
 import { WholesalerService } from "./services/wholesalerService.js";
 import { mailRouter } from "./router/mailRouter.js";
 import { MailService } from "./services/mailService.js";
+import cron from "node-cron";
 
 
 const PORT = 3000;
@@ -36,6 +37,19 @@ app.listen(PORT, () => console.log(`Server listening on: http://localhost:${PORT
 );
 
 const wholesalerService: WholesalerService = new WholesalerService();
+
+// Daily cron job
+// every day at midnight
+cron.schedule("0 0 * * *", async () => {
+    try {
+        console.log("Running daily midnight job...");
+
+        // check for overdue orders and send reminder emails
+        await wholesalerService.sendPaymentReminders();
+    } catch (error) {
+        console.error(`Daily cron job failed: ${error}`);
+    }
+});
 
 // Game Loop
 // every minute

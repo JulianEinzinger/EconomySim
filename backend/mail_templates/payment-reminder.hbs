@@ -1,0 +1,75 @@
+<table width="100%" cellspacing="0" cellpadding="0"
+    style="max-width:600px; margin:auto; background:#ffffff; border-radius:8px; overflow:hidden; font-family:Arial, sans-serif;">
+
+    <!-- Header -->
+    <tr>
+        <td style="background:#1f2d3d; color:#ffffff; padding:20px; text-align:center;">
+            <h1 style="margin:0;">{{wholesalerName}}</h1>
+        </td>
+    </tr>
+
+    <!-- Content -->
+    <tr>
+        <td style="padding:25px; color:#333333;">
+
+            <h2 style="color:#e67e22; margin-top:0;">Zahlungserinnerung</h2>
+
+            <p>Hallo {{companyName}},</p>
+
+            <p>
+                für die folgende Bestellung ist die Zahlung noch nicht bei uns eingegangen.
+                Bitte begleichen Sie den offenen Betrag zeitnah.
+            </p>
+
+            <!-- Order Details -->
+            <table width="100%" style="border-collapse: collapse; margin:20px 0;">
+                <tr style="background:#f4f6f8;">
+                    <th align="left" style="padding:10px;">Order ID</th>
+                    <th align="left" style="padding:10px;">Fällig seit</th>
+                    <th align="right" style="padding:10px;">Offener Betrag</th>
+                </tr>
+                <tr>
+                    <td style="padding:10px;">#{{orderId}}</td>
+                    <td style="padding:10px;">{{dueDate}}</td>
+                    <td style="padding:10px;" align="right">€ {{amountDue}}</td>
+                </tr>
+            </table>
+
+            <!-- Optional short summary -->
+            <p style="margin:10px 0;">
+                <strong>Status:</strong> Zahlung ausstehend
+            </p>
+
+            <!-- Warning -->
+            <div style="background:#fff3e6; color:#8a4b08; padding:15px; border-radius:6px; margin:20px 0;">
+                ⚠️ Bei weiterhin ausbleibender Zahlung behalten wir uns Einschränkungen zukünftiger Bestellungen vor.
+            </div>
+
+            <!-- CTA -->
+            <p style="text-align:center; margin:30px 0;">
+                <a href="{{orderUrl}}"
+                    style="background:#e67e22; color:#ffffff; padding:12px 20px; text-decoration:none; border-radius:5px; font-weight:bold;">
+                    Bestellung anzeigen & bezahlen
+                </a>
+            </p>
+
+            <p>
+                Falls die Zahlung bereits erfolgt ist, betrachten Sie diese Nachricht bitte als gegenstandslos.
+            </p>
+
+            <p>
+                Mit freundlichen Grüßen<br>
+                Ihr {{wholesalerName}} Team
+            </p>
+
+        </td>
+    </tr>
+
+    <!-- Footer -->
+    <tr>
+        <td style="background:#f4f6f8; padding:15px; text-align:center; font-size:12px; color:#777;">
+            © 2026 {{wholesalerName}} • EconomySim System
+        </td>
+    </tr>
+
+</table>

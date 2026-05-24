@@ -29,6 +29,12 @@ const state = {
     selectedOrderId: null
 };
 
+function getOrderIdFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("orderId");
+    return id ? Number(id) : null;
+}
+
 async function loadOrders() {
     const wholesalerNames = await loadWholesalerNames();
 
@@ -306,6 +312,9 @@ function renderOrders() {
     });
 
     renderSummary(filteredOrders);
+
+    document.querySelector(`[data-order-id="${state.selectedOrderId}"]`)
+    ?.scrollIntoView({ block: "center" });
 }
 
 async function renderDetails() {
@@ -566,5 +575,12 @@ payModalBackdrop.addEventListener('click', (e) => {
 
 registerFilters();
 await loadOrders();
+
+const urlOrderId = getOrderIdFromUrl();
+
+if (urlOrderId && state.orders.some(o => o.id ===  urlOrderId)) {
+    state.selectedOrderId = urlOrderId;
+}
+
 renderOrders();
 await renderDetails();

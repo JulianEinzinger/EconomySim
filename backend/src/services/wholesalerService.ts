@@ -2,6 +2,7 @@ import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER, BIND_IN } = oracledb;
 import { DeliveryStatus, PaymentStatus, type Wholesaler, type WholesalerOrder, type WholesalerOrderItem, type WholesalerOrderItemRow, type WholesalerOrderRow, type WholesalerProduct, type WholesalerRow } from "@economysim/shared";
 import { getDBConnection } from "../data.js";
+import { MailService } from "./mailService.js";
 
 export class WholesalerService {
 
@@ -620,5 +621,35 @@ FROM es_wholesalers w
         } catch (err) {
             console.error(`Something happened while trying to process delivered orders: ${err}`);
         }
+    }
+
+    /**
+     * Checks for orders that are overdue and send payment reminders per mail
+     */
+    async sendPaymentReminders(): Promise<void> {
+        const connection: Connection = await getDBConnection();
+
+        const result = (await connection.execute<{ ID: number, COMPANY_ID: number, WHOLESALER_NAME: string, COMPANY_NAME: string, ORDER_DATE: Date, TOTAL_PRICE: number }>
+            (`SELECT o.id, o.company_id, o.order_date, o.total_price, w.name AS wholesaler_name, c.name AS company_name FROM es_wholesaler_orders o 
+            JOIN es_wholesalers w ON o.wholesaler_id = w.id JOIN es_companies c ON o.company_id = c.id WHERE o.payment_status = :overdue_status`, {
+                overdue_status: PaymentStatus.OVERDUE
+        })).rows ?? [];
+
+        await connection.close();
+
+        const mailService: MailService = new MailService();
+
+        await Promise.all(
+            result.map(order => 
+                mailService.createMail(order.COMPANY_ID, order.WHOLESALER_NAME, `Payment Reminder #${order.ID}`, 'payment-reminder', {
+                    wholesalerName: order.WHOLESALER_NAME,
+                    companyName: order.COMPANY_NAME,
+                    orderId: order.ID,
+                    dueDate: new Date(order.ORDER_DATE.getTime() + 1000 * 60 * 60 * 24 * 3).toLocaleDateString(),
+                    amountDue: order.TOTAL_PRICE,
+                    orderUrl: `http://localhost:3800/dashboard/orders?orderId=${order.ID}`
+                })
+            )
+        );
     }
 }

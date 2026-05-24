@@ -208,6 +208,7 @@ export enum AccountType {
 
 export type Account = {
     iban: string,
+    name: string,
     companyId: number,
     accountType: AccountType,
     balance: number,
@@ -217,6 +218,7 @@ export type Account = {
 
 export type AccountRow = {
     IBAN: string,
+    NAME: string,
     COMPANY_ID: number,
     ACCOUNT_TYPE: AccountType,
     BALANCE: number,

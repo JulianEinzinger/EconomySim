@@ -199,3 +199,154 @@ export type WholesalerProduct = Product & {
     max_order_stacks: number,
     category_img_url: string
 }
+
+export enum AccountType {
+    GIRO,
+    SAVINGS,
+    FIXED_DEPOSIT
+}
+
+export type Account = {
+    iban: string,
+    companyId: number,
+    accountType: AccountType,
+    balance: number,
+    currency: string,
+    createdAt: Date
+}
+
+export type AccountRow = {
+    IBAN: string,
+    COMPANY_ID: number,
+    ACCOUNT_TYPE: AccountType,
+    BALANCE: number,
+    CURRENCY: string,
+    CREATED_AT: Date
+}
+
+export enum TransactionStatus {
+    PENDING,
+    SETTLED,
+    FAILED
+}
+
+export type Transaction = {
+    id: number,
+    fromIban: string,
+    toIban: string,
+    amount: number,
+    status: TransactionStatus,
+    initiatedAt: Date,
+    settledAt: Date | null
+}
+
+export type TransactionRow = {
+    ID: number,
+    FROM_IBAN: string,
+    TO_IBAN: string,
+    AMOUNT: number,
+    STATUS: TransactionStatus,
+    INITIATED_AT: Date,
+    SETTLED_AT: Date | null
+}
+
+export enum LedgerEntryType {
+    DEBIT,
+    CREDIT
+}
+
+export type LedgerEntry = {
+    id: number,
+    transactionId: number,
+    iban: string,
+    amount: number,
+    entryType: LedgerEntryType,
+    bookedAt: Date,
+    description: string
+}
+
+export type LedgerEntryRow = {
+    ID: number,
+    TRANSACTION_ID: number,
+    IBAN: string,
+    AMOUNT: number,
+    ENTRY_TYPE: LedgerEntryType,
+    BOOKED_AT: Date,
+    DESCRIPTION: string
+}
+
+export enum LoanType {
+    OPERATING,
+    INVESTMENT,
+    BRIDGE
+}
+
+export enum LoanStatus {
+    ACTIVE,
+    PAID_OFF,
+    DEFAULTED
+}
+
+export type Loan = {
+    id: number,
+    iban: string,
+    principal: number,
+    remainingBalance: number,
+    annualInterestRate: number,
+    loanType: LoanType,
+    status: LoanStatus,
+    startDate: Date,
+    endDate: Date
+}
+
+export type LoanRow = {
+    ID: number,
+    IBAN: string,
+    PRINCIPAL: number,
+    REMAINING_BALANCE: number,
+    ANNUAL_INTEREST_RATE: number,
+    LOAN_TYPE: LoanType,
+    STATUS: LoanStatus,
+    START_DATE: Date,
+    END_DATE: Date
+}
+
+export enum PaymentStatus {
+    PENDING,
+    PAID,
+    OVERDUE
+}
+
+export type LoanInstallment = {
+    id: number,
+    loanId: number,
+    dueDate: Date,
+    principalAmount: number,
+    interestAmount: number,
+    totalAmount: number,
+    remainingBalance: number,
+    status: PaymentStatus
+}
+
+export type LoanInstallmentRow = {
+    ID: number,
+    LOAN_ID: number,
+    DUE_DATE: Date,
+    PRINCIPAL_AMOUNT: number,
+    INTEREST_AMOUNT: number,
+    TOTAL_AMOUNT: number,
+    REMAINING_BALANCE: number,
+    STATUS: PaymentStatus
+}
+
+export type CreditScore = {
+    companyId: number,
+    score: number,
+    lastCalculatedAt: Date
+}
+
+export type CreditScoreRow = {
+    COMPANY_ID: number,
+    SCORE: number,
+    LAST_CALCULATED_AT: Date
+}

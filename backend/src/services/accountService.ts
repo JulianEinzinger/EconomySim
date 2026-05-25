@@ -112,18 +112,17 @@ export class AccountService {
     }
 
     /**
-     * Retrieves an account for a company by it's iban
+     * Retrieves an account by it's iban
      * @param iban 
      * @param companyId 
      * @returns an bank account, or undefined if no account was found
      */
-    public async getAccountByIBAN(iban: string, companyId: number): Promise<Account | undefined> {
+    public async getAccountByIBAN(iban: string): Promise<Account | undefined> {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result: AccountRow[] = (await connection.execute<AccountRow>(`SELECT * FROM es_bank_accounts WHERE iban = :iban AND company_id = :company_id`, {
-                iban: iban,
-                company_id: companyId
+            const result: AccountRow[] = (await connection.execute<AccountRow>(`SELECT * FROM es_bank_accounts WHERE iban = :iban`, {
+                iban
             })).rows ?? [];
 
             await connection.close();
@@ -175,15 +174,14 @@ export class AccountService {
      * Retrieves all ledger entries from an bank account
      * @param iban 
      * @param companyId 
-     * @returns an array of ledger entries, or an empty array if the bank account was not found or it doesn't belong to the company
+     * @returns an array of ledger entries, or an empty array if the bank account was not found
      */
-    public async getLedgerEntries(iban: string, companyId: number): Promise<LedgerEntry[]> {
+    public async getLedgerEntries(iban: string): Promise<LedgerEntry[]> {
         const connection: Connection = await getDBConnection();
 
         const result: LedgerEntryRow[] = (await connection.execute<LedgerEntryRow>(`SELECT e.* FROM es_ledger_entries e JOIN es_bank_accounts b ON e.iban = b.iban
-             WHERE iban = :iban AND b.company_id = :company_id`, {
-            iban: iban,
-            company_id: companyId
+             WHERE iban = :iban`, {
+            iban
         })).rows ?? [];
 
         await connection.close();

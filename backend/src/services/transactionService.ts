@@ -2,7 +2,7 @@ import type { Connection } from "oracledb";
 import { getDBConnection } from "../data.js";
 import { LedgerEntryType, TransactionStatus, type Transaction, type TransactionRow } from "@economysim/shared";
 
-class TransactionService {
+export class TransactionService {
     //#region Singleton
     private static instance: TransactionService;
 

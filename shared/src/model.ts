@@ -352,3 +352,12 @@ export type CreditScoreRow = {
     SCORE: number,
     LAST_CALCULATED_AT: Date
 }
+
+export type InstallmentDraft = {
+    dueDate: Date,
+    principalAmount: number,
+    interestAmount: number,
+    totalAmount: number,
+    remainingBalance: number,
+    status: PaymentStatus
+}

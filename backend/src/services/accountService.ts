@@ -114,7 +114,6 @@ export class AccountService {
     /**
      * Retrieves an account by it's iban
      * @param iban 
-     * @param companyId 
      * @returns an bank account, or undefined if no account was found
      */
     public async getAccountByIBAN(iban: string): Promise<Account | undefined> {
@@ -145,6 +144,34 @@ export class AccountService {
         } catch (err) {
             console.error(`Something happened while trying to retrieve bank account with IBAN ${iban}: ${err}`);
             return undefined;
+        }
+    }
+
+    /**
+     * Checks if an account with the given IBAN exists and if it belongs to the specified company
+     * @param iban 
+     * @param companyId 
+     * @returns true or false
+     */
+    public async doesCompanyOwnAccount(iban: string, companyId: number): Promise<boolean> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result: { COUNT: number }[] = (await connection.execute<{ COUNT: number }>(`SELECT COUNT(*) AS count FROM es_bank_accounts WHERE iban = :iban AND company_id = :company_id`, {
+                iban,
+                company_id: companyId
+            })).rows ?? [];
+
+            await connection.close();
+
+            if (result.length > 0) {
+                return result[0]!.COUNT > 0;
+            }
+
+            return false;
+        } catch (err) {
+            console.error(`Something happened while trying to check if company with id ${companyId} owns account with IBAN ${iban}: ${err}`);
+            return false;
         }
     }
 

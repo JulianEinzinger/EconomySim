@@ -2,6 +2,8 @@ import { Router, type Request, type Response } from "express";
 import { authenticateDev } from "../services/authService.js";
 import { StatusCodes } from "http-status-codes";
 import { ItemService } from "../services/itemService.js";
+import { GameConfig } from "../gameConfig.js";
+import { CreditScoreService } from "../services/creditScoreService.js";
 
 export const devRouter = Router();
 
@@ -28,4 +30,16 @@ devRouter.post("/products", authenticateDev, async (req: Request, res: Response)
     } else {
         res.status(StatusCodes.CREATED).json({ message, productId });
     }
+});
+
+devRouter.get("/bank-capacity", authenticateDev, async (req: Request, res: Response) => {
+    const cap: number = await GameConfig.getAvailableLendingCapacity();
+
+    res.status(StatusCodes.OK).json({ LendingCapacity: cap });
+});
+
+devRouter.get("/creditscore", authenticateDev, async (req: Request, res: Response) => {
+    const creditScore: number = await CreditScoreService.getInstance().recalculateScore(Number(req.query.companyId));
+
+    res.status(StatusCodes.OK).json({ CreditScore: creditScore });
 });

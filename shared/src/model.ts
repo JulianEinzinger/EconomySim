@@ -201,9 +201,9 @@ export type WholesalerProduct = Product & {
 }
 
 export enum AccountType {
-    GIRO,
-    SAVINGS,
-    FIXED_DEPOSIT
+    GIRO = "GIRO",
+    SAVINGS = "SAVINGS",
+    FIXED_DEPOSIT = "FIXED_DEPOSIT"
 }
 
 export type Account = {
@@ -227,9 +227,9 @@ export type AccountRow = {
 }
 
 export enum TransactionStatus {
-    PENDING,
-    SETTLED,
-    FAILED
+    PENDING = "PENDING",
+    SETTLED = "SETTLED",
+    FAILED = "FAILED"
 }
 
 export type Transaction = {
@@ -253,8 +253,8 @@ export type TransactionRow = {
 }
 
 export enum LedgerEntryType {
-    DEBIT,
-    CREDIT
+    DEBIT = "DEBIT",
+    CREDIT = "CREDIT"
 }
 
 export type LedgerEntry = {
@@ -278,15 +278,15 @@ export type LedgerEntryRow = {
 }
 
 export enum LoanType {
-    OPERATING,
-    INVESTMENT,
-    BRIDGE
+    OPERATING = "OPERATING",
+    INVESTMENT = "INVESTMENT",
+    BRIDGE = "BRIDGE"
 }
 
 export enum LoanStatus {
-    ACTIVE,
-    PAID_OFF,
-    DEFAULTED
+    ACTIVE = "ACTIVE",
+    PAID_OFF = "PAID_OFF",
+    DEFAULTED = "DEFAULTED"
 }
 
 export type Loan = {
@@ -314,15 +314,16 @@ export type LoanRow = {
 }
 
 export enum PaymentStatus {
-    PENDING,
-    PAID,
-    OVERDUE
+    PENDING = "PENDING",
+    PAID = "PAID",
+    OVERDUE = "OVERDUE"
 }
 
 export type LoanInstallment = {
     id: number,
     loanId: number,
     dueDate: Date,
+    paidAt: Date | null,
     principalAmount: number,
     interestAmount: number,
     totalAmount: number,
@@ -334,6 +335,7 @@ export type LoanInstallmentRow = {
     ID: number,
     LOAN_ID: number,
     DUE_DATE: Date,
+    PAID_AT: Date | null,
     PRINCIPAL_AMOUNT: number,
     INTEREST_AMOUNT: number,
     TOTAL_AMOUNT: number,

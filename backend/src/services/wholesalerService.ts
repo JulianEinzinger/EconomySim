@@ -14,7 +14,7 @@ export class WholesalerSevice {
 
             const result: WholesalerRow[] = (await connection.execute<WholesalerRow>(`SELECT w.id AS W_ID, w.name AS W_NAME, l.latitude, 
                 w.logo_url AS W_LOGO_URL, l.longitude, l.city_name, c.name as country_name, wp.PRODUCT_ID, wp.price, wp.STOCK_QUANTITY,
-                wp.ORDER_UNIT, wp.MAX_ORDER_STACKS, p.NAME AS p_name, p.IMG_URL, p.UNIT AS p_unit, pc.NAME AS p_category, pc.img_url as category_img_url
+                wp.ORDER_UNIT, wp.MAX_ORDER_STACKS, p.NAME AS p_name, p.IMG_URL, p.UNIT AS p_unit, p.MARKET_PRICE AS p_market_price, pc.NAME AS p_category, pc.img_url as category_img_url
 FROM es_wholesalers w
     JOIN es_locations l ON w.location_id = l.id
     JOIN es_countries c ON l.country_code = c.country_code
@@ -47,6 +47,7 @@ FROM es_wholesalers w
                     name: wr.P_NAME,
                     product_category: wr.P_CATEGORY,
                     unit: wr.P_UNIT,
+                    marketPrice: wr.P_MARKET_PRICE,
                     imgUrl: wr.IMG_URL,
                     price: wr.PRICE,
                     stock_quantity: wr.STOCK_QUANTITY,

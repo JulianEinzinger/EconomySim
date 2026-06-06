@@ -1,6 +1,7 @@
 import type { Connection } from "oracledb";
 import { getDBConnection } from "../data.js";
-import { PaymentStatus, type LoanInstallment, type LoanInstallmentRow } from "@economysim/shared";
+import { PaymentStatus, type InventoryItem, type LoanInstallment, type LoanInstallmentRow } from "@economysim/shared";
+import { ItemService } from "./itemService.js";
 
 export class CreditScoreService {
     //#region Singleton
@@ -37,15 +38,48 @@ export class CreditScoreService {
             status: ir.STATUS
         }));
 
-        const companyAgeMonths = 0 //TODO: add company founding date in db, add a query here for retrieving age
+        const companyAgeResult = (await connection.execute<{ FOUNDING_DATE: Date }>(`SELECT founding_date FROM es_companies WHERE id = :id`, {
+            id: companyId
+        })).rows ?? [];
+
+        const totalOutstandingLoansResult = (await connection.execute<{ TOTAL_LOANS: number }>(`SELECT SUM(l.remaining_balance) AS total_loans FROM es_bank_accounts ba JOIN es_loans l ON ba.iban = l.iban WHERE ba.company_id = :company_id`, {
+            company_id: companyId
+        })).rows ?? [{ TOTAL_LOANS: 0 }];
+
+        const totalOutstandingLoans: number = totalOutstandingLoansResult[0]?.TOTAL_LOANS ?? 0;
+
+        const totalBalanceResult = (await connection.execute<{ TOTAL_BALANCE: number }>(`SELECT SUM(balance) AS total_balance FROM es_bank_accounts WHERE company_id = :company_id`, {
+            company_id: companyId
+        })).rows ?? [{ TOTAL_BALANCE: 0}];
+
+        const totalBalance: number = totalBalanceResult[0]?.TOTAL_BALANCE ?? 0;
+
+        await connection.close();
+
+        const itemService: ItemService = new ItemService();
+
+        const warehouses = await itemService.getWarehousesByCompanyId(companyId) ?? [];
+        const items: InventoryItem[] = warehouses[0]?.items ?? [];
+
+        const inventoryValue: number = warehouses.reduce((wareHouseSum, warehouse) => wareHouseSum + warehouse.items.reduce((sum, item) => sum + item.quantity * item.marketPrice, 0), 0);
+
+        const equity: number = totalBalance - totalOutstandingLoans + inventoryValue;
+
+        if(companyAgeResult.length < 1) {
+            console.error(`Company not found!`);
+            return -1; //TODO: handle this case properly
+        }
+
+        const companyAgeMonths: number = (new Date().getTime() - companyAgeResult[0]!.FOUNDING_DATE.getTime()) / 1000 / 60 / 60 / 24 / 30;
 
         const paymentScore: number = this.calculatePaymentScore(installments);
         const ageScore: number = this.calculateAgeScore(companyAgeMonths);
-        const debtScore: number = this.calculateDebtScore(0, 0); //TODO: add a query for retrieving total debt and total equity
+        const debtScore: number = this.calculateDebtScore(totalOutstandingLoans, equity); // future improvement: consider total assets including machines, farmlands, etc.
 
-        // Simple weighted average of the three scores
-        const overallScore = Math.round((paymentScore * 0.5) + (ageScore * 0.2) + (debtScore * 0.3));
+        // Simple weighted average of the three scores (300-850)
+        const overallScore = Math.round((paymentScore * 0.6 + ageScore * 0.15 + debtScore * 0.25) * 5.5 + 300);
 
+        return inventoryValue;
         return overallScore;
     }
 
@@ -54,7 +88,10 @@ export class CreditScoreService {
     }
 
     private calculateDebtScore(totalDebt: number, totalEquity: number): number {
-        const debtEquity: number = totalEquity === 0 ? totalDebt : totalDebt / totalEquity;
+        if(totalEquity <= 0) {
+            return 10;
+        }
+        const debtEquity: number =  totalDebt / totalEquity;
 
         if (debtEquity < 0.3) {
             return 100;
@@ -66,13 +103,13 @@ export class CreditScoreService {
             return 50;
         } else if (debtEquity < 3) {
             return 25;
-        } else {
-            return 10;
         }
+
+        return 10;
     }
 
     private calculatePaymentScore(installments: LoanInstallment[]): number {
-        if(installments.length == 0) return 100;
+        if(installments.length == 0) return 70; // No payment history => neutral score
         let totalWeight = 0;
         let achievedWeight = 0;
 

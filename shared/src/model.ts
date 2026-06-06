@@ -75,7 +75,8 @@ export type Product = {
     name: string,
     imgUrl: string,
     product_category: string,
-    unit: string
+    unit: string,
+    marketPrice: number
 }
 
 export type ProductRow = {
@@ -83,7 +84,8 @@ export type ProductRow = {
     NAME: string,
     IMG_URL: string,
     PRODUCT_CATEGORY: string,
-    UNIT: string
+    UNIT: string,
+    MARKET_PRICE: number
 }
 
 export type InventoryItem = Product & {
@@ -136,6 +138,7 @@ export type WarehouseWithItemsRow = {
     P_NAME: string | null;
     IMG_URL: string | null;
     UNIT: string | null;
+    MARKET_PRICE: number | null;
     PRODUCT_CATEGORY: string | null;
 }
 
@@ -187,6 +190,7 @@ export type WholesalerRow = {
     P_NAME: string,
     IMG_URL: string,
     P_UNIT: string,
+    P_MARKET_PRICE: number,
     P_CATEGORY: string,
 
     CATEGORY_IMG_URL: string

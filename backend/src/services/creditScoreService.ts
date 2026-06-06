@@ -2,6 +2,7 @@ import type { Connection } from "oracledb";
 import { getDBConnection } from "../data.js";
 import { PaymentStatus, type InventoryItem, type LoanInstallment, type LoanInstallmentRow } from "@economysim/shared";
 import { ItemService } from "./itemService.js";
+import { GameConfig } from "../gameConfig.js";
 
 export class CreditScoreService {
     //#region Singleton
@@ -66,7 +67,7 @@ export class CreditScoreService {
         const equity: number = totalBalance - totalOutstandingLoans + inventoryValue;
 
         if(companyAgeResult.length < 1) {
-            console.error(`Company not found!`);
+            console.error(`Error while calculating credit score: Company not found!`);
             return -1; //TODO: handle this case properly
         }
 
@@ -79,8 +80,27 @@ export class CreditScoreService {
         // Simple weighted average of the three scores (300-850)
         const overallScore = Math.round((paymentScore * 0.6 + ageScore * 0.15 + debtScore * 0.25) * 5.5 + 300);
 
-        return inventoryValue;
         return overallScore;
+    }
+
+    async getInterestRateForCompany(companyId: number): Promise<number> {
+        const creditScore = await this.recalculateScore(companyId);
+
+        const baseRate = GameConfig.getBaseRate();
+
+        const riskPremium = this.calculateRiskPremium(creditScore);
+
+        const marketPremium = 0; // future improvement: calculate a market premium based on supply/demand, economic conditions, etc.
+
+        const interestRate = baseRate + marketPremium + riskPremium;
+
+        return Math.round((interestRate * 100)) / 100 // auf 2 Kommastellen runden
+    }
+
+    private calculateRiskPremium(creditScore: number): number  {
+        const normalized = (850 - creditScore) / (850-300);
+
+        return 0.5 + normalized * 24.5; // 0.5% - 25%
     }
 
     private calculateAgeScore(companyAgeMonths: number): number {

@@ -218,10 +218,3 @@ a {
     cursor: pointer;
     font-family: inherit;
 }
-
-.balance-display {
-    padding: 20px 20px 20px 20px;
-    color: #e9cd2d;
-    font-weight: bold;
-    margin-bottom: 30px;
-}

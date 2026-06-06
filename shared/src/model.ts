@@ -15,7 +15,6 @@ export type Company = {
     name: string,
     ownerId: number,
     businessTypeId: number,
-    balance: number
 }
 
 export type CompanyRow = {
@@ -24,7 +23,6 @@ export type CompanyRow = {
     OWNERID: number,
     BUSINESS_TYPE_ID: number,
     BUSINESS_TYPE_NAME: string,
-    BALANCE: number
 }
 
 /**

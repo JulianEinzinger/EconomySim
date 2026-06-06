@@ -43,3 +43,9 @@ devRouter.get("/creditscore", authenticateDev, async (req: Request, res: Respons
 
     res.status(StatusCodes.OK).json({ CreditScore: creditScore });
 });
+
+devRouter.get("/rate", authenticateDev, async (req: Request, res: Response) => {
+    const interestRate: number = await CreditScoreService.getInstance().getInterestRateForCompany(Number(req.query.companyId));
+
+    res.status(StatusCodes.OK).json({ "Interest Rate": interestRate });
+});

@@ -73,3 +73,8 @@ Authorization: Bearer dev123
 
 GET {{baseUrl}}/dev/creditscore?companyId=3
 Authorization: Bearer dev123
+
+###
+
+GET {{baseUrl}}/dev/rate?companyId=3
+Authorization: Bearer dev123 

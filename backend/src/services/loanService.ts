@@ -7,7 +7,7 @@ import { CreditScoreService } from "./creditScoreService.js";
 import { TransactionService } from "./transactionService.js";
 import { MailService } from "./mailService.js";
 
-class LoanService {
+export class LoanService {
     //#region Singleton
     private static instance: LoanService;
 

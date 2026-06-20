@@ -12,6 +12,7 @@ import { WholesalerService } from "./services/wholesalerService.js";
 import { mailRouter } from "./router/mailRouter.js";
 import { MailService } from "./services/mailService.js";
 import { bankRouter } from "./router/bankRouter.js";
+import { LoanService } from "./services/loanService.js";
 
 
 const PORT = 3000;
@@ -47,6 +48,8 @@ const gameLoop = async () => {
         await wholesalerService.processOverdueOrders();
         // check delivery times and update order status if necessary
         await wholesalerService.processDeliveredOrders();
+        // check for overdue loan installments and update their status + send mails
+        await LoanService.getInstance().processOverdueInstallments();
     } catch (error) {
         
     }

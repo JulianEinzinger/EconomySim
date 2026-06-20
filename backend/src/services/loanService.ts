@@ -1,5 +1,6 @@
 import { LoanStatus, PaymentStatus, type Account, type InstallmentDraft, type Loan, type LoanInstallment, type LoanRow, type LoanType } from "@economysim/shared";
-import { BIND_OUT, NUMBER, type Connection } from "oracledb";
+import oracledb, { type Connection } from "oracledb";
+const { BIND_OUT, NUMBER } = oracledb;
 import { getDBConnection } from "../data.js";
 import { AccountService } from "./accountService.js";
 import { GameConfig } from "../gameConfig.js";
@@ -216,7 +217,7 @@ export class LoanService {
                 pending_status: PaymentStatus.PENDING,
                 now: new Date()
             });
-            const overdueInstallments = (await connection.execute<LoanInstallment&{ COMPANY_ID: number, COMPANY_NAME: string }>(`SELECT li.*, b.company_id, c.name AS company_name FROM es_loan_installments li JOIN es_loans l JOIN li.loan_id = l.id JOIN es_bank_accounts b ON l.iban = b.iban JOIN es_companies c ON b.company_id = c.id WHERE status = :pending_status AND due_date <= :now`, {
+            const overdueInstallments = (await connection.execute<LoanInstallment&{ COMPANY_ID: number, COMPANY_NAME: string }>(`SELECT li.*, b.company_id, c.name AS company_name FROM es_loan_installments li JOIN es_loans l ON li.loan_id = l.id JOIN es_bank_accounts b ON l.iban = b.iban JOIN es_companies c ON b.company_id = c.id WHERE li.status = :pending_status AND li.due_date <= :now`, {
                 pending_status: PaymentStatus.PENDING,
                 now: new Date()
             })).rows ?? [];

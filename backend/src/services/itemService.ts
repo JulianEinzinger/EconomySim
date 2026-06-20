@@ -22,7 +22,8 @@ export class ItemService {
                 name: p.NAME,
                 imgUrl: p.IMG_URL,
                 product_category: p.PRODUCT_CATEGORY,
-                unit: p.UNIT
+                unit: p.UNIT,
+                marketPrice: p.MARKET_PRICE
             }));
         } catch(err) {
             console.error(`Something happened while trying to retrieve products from database: ${err}`);
@@ -51,6 +52,7 @@ export class ItemService {
                 imgUrl: ir.IMG_URL,
                 product_category: ir.PRODUCT_CATEGORY,
                 unit: ir.UNIT,
+                marketPrice: ir.MARKET_PRICE,
                 quantity: ir.QUANTITY,
                 companyId: ir.COMPANY_ID
             }));
@@ -88,6 +90,7 @@ export class ItemService {
     p.name            AS P_NAME,
     p.img_url         AS IMG_URL,
     p.unit            AS UNIT,
+    p.market_price    AS MARKET_PRICE,
     pc.name           AS PRODUCT_CATEGORY
 
 FROM es_warehouses w
@@ -131,6 +134,7 @@ ORDER BY w.id, p.name`,
                     imgUrl: r.IMG_URL!,
                     product_category: r.PRODUCT_CATEGORY!,
                     unit: r.UNIT!,
+                    marketPrice: r.MARKET_PRICE!,
                     quantity: r.QUANTITY!,
                     companyId: r.W_COMPANY_ID
                 });

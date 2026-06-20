@@ -5,6 +5,7 @@ import { AccountService } from "./accountService.js";
 import { GameConfig } from "../gameConfig.js";
 import { CreditScoreService } from "./creditScoreService.js";
 import { TransactionService } from "./transactionService.js";
+import { MailService } from "./mailService.js";
 
 class LoanService {
     //#region Singleton
@@ -215,9 +216,24 @@ class LoanService {
                 pending_status: PaymentStatus.PENDING,
                 now: new Date()
             });
+            const overdueInstallments = (await connection.execute<LoanInstallment&{ COMPANY_ID: number, COMPANY_NAME: string }>(`SELECT li.*, b.company_id, c.name AS company_name FROM es_loan_installments li JOIN es_loans l JOIN li.loan_id = l.id JOIN es_bank_accounts b ON l.iban = b.iban JOIN es_companies c ON b.company_id = c.id WHERE status = :pending_status AND due_date <= :now`, {
+                pending_status: PaymentStatus.PENDING,
+                now: new Date()
+            })).rows ?? [];
 
             await connection.commit();
             await connection.close();
+
+            for (const installment of overdueInstallments) {
+                await MailService.getInstance().createMail<'installment-reminder'>(installment.COMPANY_ID, `Bank`, `Payment reminder`, 'installment-reminder', {
+                    bankName: 'Sparkasse Oberösterreich Bank AG',
+                    wholesalerName: installment.COMPANY_NAME,
+                    loanNumber: installment.loanId.toString(),
+                    dueDate: MailService.formatDate(installment.dueDate),
+                    installmentAmount: installment.totalAmount,
+                    bankIban: GameConfig.CENTRAL_BANK_ACCOUNT_IBAN
+                });
+            }
         } catch (err) {
             console.error(`Something happened while trying to process overdue installments: ${err}`);
         }

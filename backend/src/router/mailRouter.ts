@@ -14,9 +14,7 @@ mailRouter.get("/", authenticateToken, async (req: Request, res: Response) => {
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid company id' });
     }
 
-    const service: MailService = new MailService();
-
-    const mails: Mail[] = await service.getAllMailsForCompany(companyId);
+    const mails: Mail[] = await MailService.getInstance().getAllMailsForCompany(companyId);
 
     res.status(StatusCodes.OK).json(mails);
 });
@@ -29,12 +27,11 @@ mailRouter.get("/unread-count", authenticateToken, async (req: Request, res: Res
         res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid company id' });
     }
 
-    const mailService: MailService = new MailService();
     const companyService: CompanyService = new CompanyService();
 
     if(await companyService.isCompanyOwnedByUser(companyId, userId)) {
         // company gehört user
-        const unreadCount: number = await mailService.getUnreadMailsCountForCompany(companyId);
+        const unreadCount: number = await MailService.getInstance().getUnreadMailsCountForCompany(companyId);
 
         res.status(StatusCodes.OK).json({ unreadCount: unreadCount });
     } else {
@@ -50,10 +47,9 @@ mailRouter.get("/:mailId", authenticateToken, async (req: Request, res: Response
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid mail id' });
     }
 
-    const mailService: MailService = new MailService();
     const companyService: CompanyService = new CompanyService();
 
-    const mail: Mail | null = await mailService.getMailById(mailId);
+    const mail: Mail | null = await MailService.getInstance().getMailById(mailId);
 
     if(!mail) {
         res.status(StatusCodes.NOT_FOUND).json({ message: `Mail not found` });
@@ -75,17 +71,16 @@ mailRouter.post("/:mailId/read", authenticateToken, async (req: Request, res: Re
         res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid mail id' });
     }
 
-    const mailService: MailService = new MailService();
     const companyService: CompanyService = new CompanyService();
 
-    const mail: Mail | null = await mailService.getMailById(mailId);
+    const mail: Mail | null = await MailService.getInstance().getMailById(mailId);
 
     if(!mail) {
         res.status(StatusCodes.NOT_FOUND).json({ message: `Mail not found` });
     } else {
         if(await companyService.isCompanyOwnedByUser(mail.recipientId, userId)) {
             // company von mail gehört user
-            const result: boolean = await mailService.markAsRead(mailId, mail.recipientId);
+            const result: boolean = await MailService.getInstance().markAsRead(mailId, mail.recipientId);
             if(result) {
                 res.status(StatusCodes.OK).json(mail.id);
             } else {
@@ -105,17 +100,16 @@ mailRouter.post("/:mailId/archive", authenticateToken, async (req: Request, res:
         res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid mail id' });
     }
 
-    const mailService: MailService = new MailService();
     const companyService: CompanyService = new CompanyService();
 
-    const mail: Mail | null = await mailService.getMailById(mailId);
+    const mail: Mail | null = await MailService.getInstance().getMailById(mailId);
 
     if(!mail) {
         res.status(StatusCodes.NOT_FOUND).json({ message: `Mail not found` });
     } else {
         if(await companyService.isCompanyOwnedByUser(mail.recipientId, userId)) {
             // company von mail gehört user
-            const result: boolean = await mailService.archiveMail(mailId, mail.recipientId);
+            const result: boolean = await MailService.getInstance().archiveMail(mailId, mail.recipientId);
             if(result) {
                 res.status(StatusCodes.OK).json(mail.id);
             } else {
@@ -135,17 +129,16 @@ mailRouter.delete("/:mailId", authenticateToken, async (req: Request, res: Respo
         res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid mail id' });
     }
 
-    const mailService: MailService = new MailService();
     const companyService: CompanyService = new CompanyService();
 
-    const mail: Mail | null = await mailService.getMailById(mailId);
+    const mail: Mail | null = await MailService.getInstance().getMailById(mailId);
 
     if(!mail) {
         return res.status(StatusCodes.NOT_FOUND).json({ message: 'Mail not found' });
     } else {
         if (await companyService.isCompanyOwnedByUser(mail.recipientId, userId)) {
             // company von mail gehört user
-            const result = await mailService.deleteMail(mailId, mail.recipientId);
+            const result = await MailService.getInstance().deleteMail(mailId, mail.recipientId);
             if(result) {
                 res.status(StatusCodes.NO_CONTENT).json({});
             } else {

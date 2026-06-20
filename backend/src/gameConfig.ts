@@ -15,6 +15,8 @@ export class GameConfig {
         return this.BASE_INTEREST_RATE;
     }
 
+    public static CENTRAL_BANK_ACCOUNT_IBAN = "CENTRALBANK0000000000";
+
     public static async getAvailableLendingCapacity(): Promise<number> {
         try {
             const connection: Connection = await getDBConnection();

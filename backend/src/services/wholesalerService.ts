@@ -405,7 +405,7 @@ FROM es_wholesalers w
 
             // Todo: Betrag abbuchen
 
-            await this.updatePaymentStatus(orderId, PaymentStatus.PAYED);
+            await this.updatePaymentStatus(orderId, PaymentStatus.PAID);
         } catch (err) {
             console.error(`Something happened while trying to pay order #${orderId}: ${err}`);
         }

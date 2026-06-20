@@ -218,3 +218,28 @@ a {
     cursor: pointer;
     font-family: inherit;
 }
+
+.sidebar-list-item {
+    position: relative;
+    /*
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    */
+}
+
+.badge {
+    margin-left: 1rem;
+    background-color: #c23c43;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 999px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}

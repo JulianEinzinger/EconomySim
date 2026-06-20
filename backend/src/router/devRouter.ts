@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { authenticateDev } from "../services/authService.js";
 import { StatusCodes } from "http-status-codes";
 import { ItemService } from "../services/itemService.js";
+import { WholesalerService } from "../services/wholesalerService.js";
 import { GameConfig } from "../gameConfig.js";
 import { CreditScoreService } from "../services/creditScoreService.js";
 
@@ -30,6 +31,15 @@ devRouter.post("/products", authenticateDev, async (req: Request, res: Response)
     } else {
         res.status(StatusCodes.CREATED).json({ message, productId });
     }
+});
+
+devRouter.get("/delivery-date", authenticateDev, async (req: Request, res: Response) => {
+    const {wholesalerId, companyId}: {wholesalerId: number, companyId: number} = req.body;
+
+    const service: WholesalerService = new WholesalerService();
+
+    const deliveryDate = await service.calculateDeliveryDate(wholesalerId, companyId);
+    res.status(StatusCodes.OK).json({ deliveryDate: deliveryDate });
 });
 
 devRouter.get("/bank-capacity", authenticateDev, async (req: Request, res: Response) => {

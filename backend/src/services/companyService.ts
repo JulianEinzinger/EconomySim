@@ -133,7 +133,7 @@ export class CompanyService {
 
             const connection: Connection = await getDBConnection();
 
-            const rows: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT id, name, ownerid, business_type_id FROM es_companies WHERE id = :companyId", {
+            const rows: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT c.id, c.name, c.ownerid, c.business_type_id FROM es_companies c WHERE c.id = :companyId", {
                 companyId: companyId
             })).rows ?? [];
 

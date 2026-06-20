@@ -3,6 +3,23 @@ import type { Connection } from "oracledb";
 import { getDBConnection } from "../data.js";
 
 export class AccountService {
+    //#region Singleton
+    private static instance: AccountService;
+
+    private constructor() {
+        // Private constructor to prevent instantiation
+    }
+
+    public static getInstance(): AccountService {
+        if(!AccountService.instance) {
+            AccountService.instance = new AccountService();
+        }
+
+        return AccountService.instance;
+    }
+
+    //#endregion
+
     /**
      * Creates a new bank account and returns it's IBAN
      * @param companyId id of the company to create the bank account for

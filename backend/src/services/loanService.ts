@@ -24,8 +24,7 @@ class LoanService {
 
     async applyForLoan(companyId: number, iban: string, principal: number, loanType: LoanType, termMonths: number): Promise<void> {
         try {
-            const accountService: AccountService = new AccountService();
-            const isAccountOwnedByCompany: boolean = await accountService.doesCompanyOwnAccount(iban, companyId);
+            const isAccountOwnedByCompany: boolean = await AccountService.getInstance().doesCompanyOwnAccount(iban, companyId);
 
             if (!isAccountOwnedByCompany) {
                 throw new Error("Account not found");

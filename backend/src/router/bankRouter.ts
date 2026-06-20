@@ -15,14 +15,13 @@ bankRouter.get("/accounts", authenticateToken, async (req: Request, res: Respons
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid company id' });
     }
 
-    const accountService: AccountService = new AccountService();
     const companyService: CompanyService = new CompanyService();
 
     if(!(await companyService.isCompanyOwnedByUser(companyId, userId))) {
         return res.status(StatusCodes.FORBIDDEN).json({ message: 'You don\'t have access to this company\'s bank accounts' });
     }
 
-    const accounts: Account[] = await accountService.getAccountsForCompany(companyId);
+    const accounts: Account[] = await AccountService.getInstance().getAccountsForCompany(companyId);
 
     res.status(StatusCodes.OK).json(accounts);
 });
@@ -34,9 +33,7 @@ bankRouter.get("/accounts/:iban", authenticateToken, async (req: Request, res: R
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid iban' });
     }
 
-    const accountService: AccountService = new AccountService();
-
-    const account: Account | undefined = await accountService.getAccountByIBAN(iban);
+    const account: Account | undefined = await AccountService.getInstance().getAccountByIBAN(iban);
 
     if(!account) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'An error happened. Try again later!' });
@@ -52,9 +49,7 @@ bankRouter.get("/accounts/:iban/ledger", authenticateToken, async (req: Request,
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid iban' });
     }
 
-    const accountService: AccountService = new AccountService();
-
-    const entries: LedgerEntry[] = await accountService.getLedgerEntries(iban);
+    const entries: LedgerEntry[] = await AccountService.getInstance().getLedgerEntries(iban);
 
     res.status(StatusCodes.OK).json({ ledgerEntries: entries });
 });

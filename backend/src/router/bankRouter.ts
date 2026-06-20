@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { authenticateToken } from "../services/authService.js";
 import { StatusCodes } from "http-status-codes";
-import type { Account, LedgerEntry } from "@economysim/shared";
+import { AccountType, type Account, type LedgerEntry } from "@economysim/shared";
 import { AccountService } from "../services/accountService.js";
 import { CompanyService } from "../services/companyService.js";
 
@@ -52,4 +52,17 @@ bankRouter.get("/accounts/:iban/ledger", authenticateToken, async (req: Request,
     const entries: LedgerEntry[] = await AccountService.getInstance().getLedgerEntries(iban);
 
     res.status(StatusCodes.OK).json({ ledgerEntries: entries });
+});
+
+bankRouter.post("/accounts", authenticateToken, async (req: Request, res: Response) => {
+    const { companyId, accountName }: { companyId: number, accountName: string } = req.body;
+
+    try {
+        const iban: string = await AccountService.getInstance().createAccount(companyId, AccountType.GIRO, accountName);
+
+        res.status(StatusCodes.CREATED).json({ iban });
+    } catch (err) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err });
+    }
+    
 });

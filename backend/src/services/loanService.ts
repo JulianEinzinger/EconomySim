@@ -203,12 +203,24 @@ export class LoanService {
     async payInstallment(installmentId: number, companyId: number): Promise<void> {
         try {
             const connection: Connection = await getDBConnection();
-            const installment = ((await connection.execute<LoanInstallment>(`SELECT * FROM es_loan_installments WHERE id = :installment_id`, {
+            const installmentRow = ((await connection.execute<LoanInstallmentRow>(`SELECT * FROM es_loan_installments WHERE id = :installment_id`, {
                 installment_id: installmentId
             })).rows ?? [])[0];
 
-            if (!installment) {
+            if (!installmentRow) {
                 throw new Error(`Loan Installment with id ${installmentId} was not found`);
+            }
+
+            const installment: LoanInstallment = {
+                id: installmentRow?.ID,
+                loanId: installmentRow?.LOAN_ID,
+                dueDate: installmentRow.DUE_DATE,
+                paidAt: installmentRow.PAID_AT,
+                principalAmount: installmentRow.PRINCIPAL_AMOUNT,
+                interestAmount: installmentRow.INTEREST_AMOUNT,
+                totalAmount: installmentRow.TOTAL_AMOUNT,
+                remainingBalance: installmentRow.REMAINING_BALANCE,
+                status: installmentRow.STATUS
             }
 
             const loan = await this.getLoanById(installment.loanId);
@@ -226,13 +238,13 @@ export class LoanService {
 
             await TransactionService.getInstance().transfer(loan!.iban, GameConfig.CENTRAL_BANK_ACCOUNT_IBAN, installment.totalAmount, `Loan installment (${loan!.id})`);
 
-            await connection.execute(`UPDATE es_loan_installments SET status = :status, paid_at = :date WHERE id = :id`, {
+            await connection.execute(`UPDATE es_loan_installments SET status = :status, paid_at = :paid_at WHERE id = :id`, {
                 status: PaymentStatus.PAID,
-                date: new Date(),
+                paid_at: new Date(),
                 id: installmentId
             });
 
-            await connection.execute(`UPDATE es_loans SET remaining_balance = remainingBalance - :amount WHERE id = :id`, {
+            await connection.execute(`UPDATE es_loans SET remaining_balance = remaining_balance - :amount WHERE id = :id`, {
                 amount: installment.principalAmount,
                 id: installment.loanId
             });

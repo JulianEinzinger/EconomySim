@@ -64,7 +64,7 @@ orderRouter.get("/:orderId/items", authenticateToken ,async (req: Request, res: 
 
 orderRouter.put("/:orderId/pay", authenticateToken, async (req: Request, res: Response) => {
     const orderId: number = Number(req.params.orderId);
-    const bankAccountId: number = Number(req.body.bankAccountId);
+    const bankAccountId: string = req.body.bankAccountId;
     const userId: number = req.user!.userId;
 
     if(isNaN(orderId)) {

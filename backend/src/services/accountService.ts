@@ -1,6 +1,7 @@
 import type { Account, AccountRow, AccountType, LedgerEntry, LedgerEntryRow } from "@economysim/shared";
 import type { Connection } from "oracledb";
 import { getDBConnection } from "../data.js";
+import { GameConfig } from "../gameConfig.js";
 
 export class AccountService {
     //#region Singleton
@@ -223,8 +224,9 @@ export class AccountService {
     public async getLedgerEntries(iban: string): Promise<LedgerEntry[]> {
         const connection: Connection = await getDBConnection();
 
-        const result: LedgerEntryRow[] = (await connection.execute<LedgerEntryRow>(`SELECT e.* FROM es_ledger_entries e JOIN es_bank_accounts b ON e.iban = b.iban
-             WHERE iban = :iban`, {
+        const result: LedgerEntryRow[] = (await connection.execute<LedgerEntryRow>(`SELECT e.* FROM es_ledger_entries e
+             WHERE e.iban = :iban
+             ORDER BY e.booked_at DESC`, {
             iban
         })).rows ?? [];
 
@@ -239,5 +241,25 @@ export class AccountService {
             bookedAt: lr.BOOKED_AT,
             description: lr.DESCRIPTION
         }));        
+    }
+
+    public async ensureCentralBankAccountExists(): Promise<void> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            await connection.execute(`INSERT INTO es_bank_accounts (iban, name, company_id, account_type, balance, currency) VALUES (:iban, :name, :company_id, :account_type, :balance, :currency)`, {
+                iban: GameConfig.CENTRAL_BANK_ACCOUNT_IBAN,
+                name: "Central Bank Account",
+                company_id: null,
+                account_type: "CENTRAL_BANK",
+                balance: GameConfig.BASE_CAPITAL,
+                currency: 'EUR'
+            });
+
+            await connection.commit();
+            await connection.close();
+        } catch (err) {
+            console.error("Central bank account already exists");
+        }
     }
 }

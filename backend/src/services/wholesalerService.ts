@@ -391,17 +391,14 @@ FROM es_wholesalers w
     /**
      * Processes the payment for a specific order using the provided bank account ID. It checks if the order exists and verifies if the bank account has sufficient balance. If the payment is successful, it updates the payment status.
      * @param orderId 
-     * @param bankAccountId 
+     * @param iban 
      * @returns 
      */
-    async payOrder(orderId: number, bankAccountId: number): Promise<void> {
+    async payOrder(orderId: number, iban: string): Promise<void> {
         try {
             const order = await this.getOrderById(orderId);
             if(!order) return;
             const totalPrice = order.totalPrice;
-            // TODO check if bank account balance is sufficient
-            const isSufficient = true;
-            if(!isSufficient) return;
 
             // Todo: Betrag abbuchen
 

@@ -84,7 +84,11 @@ export class CreditScoreService {
     }
 
     async getInterestRateForCompany(companyId: number): Promise<number> {
-        const creditScore = await this.recalculateScore(companyId);
+        let creditScore = await this.recalculateScore(companyId);
+
+        if (creditScore < 300) {
+            creditScore = 550;
+        }
 
         const baseRate = GameConfig.getBaseRate();
 
@@ -98,7 +102,8 @@ export class CreditScoreService {
     }
 
     private calculateRiskPremium(creditScore: number): number  {
-        const normalized = (850 - creditScore) / (850-300);
+        const normalizedScore = Math.min(Math.max(creditScore, 300), 850);
+        const normalized = (850 - normalizedScore) / (850 - 300);
 
         return 0.5 + normalized * 24.5; // 0.5% - 25%
     }

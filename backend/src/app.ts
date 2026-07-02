@@ -13,6 +13,8 @@ import { mailRouter } from "./router/mailRouter.js";
 import { MailService } from "./services/mailService.js";
 import { bankRouter } from "./router/bankRouter.js";
 import { LoanService } from "./services/loanService.js";
+import { AccountService } from "./services/accountService.js";
+import { TransactionService } from "./services/transactionService.js";
 
 
 const PORT = 3000;
@@ -40,6 +42,9 @@ app.listen(PORT, () => console.log(`Server listening on: http://localhost:${PORT
 
 const wholesalerService: WholesalerService = new WholesalerService();
 
+// ensure central bank account exists
+await AccountService.getInstance().ensureCentralBankAccountExists();
+
 // Game Loop
 // every minute
 const gameLoop = async () => {
@@ -50,6 +55,8 @@ const gameLoop = async () => {
         await wholesalerService.processDeliveredOrders();
         // check for overdue loan installments and update their status + send mails
         await LoanService.getInstance().processOverdueInstallments();
+        // complete pending transactions
+        await TransactionService.getInstance().completePendingTransactions();
     } catch (error) {
         
     }

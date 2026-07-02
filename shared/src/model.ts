@@ -203,9 +203,9 @@ export type WholesalerProduct = Product & {
 }
 
 export enum PaymentStatus {
-    PENDING = 'Pending',
-    PAID = 'Payed',
-    OVERDUE = 'Overdue'
+    PENDING = 'PENDING',
+    PAID = 'PAID',
+    OVERDUE = 'OVERDUE'
 }
 
 export enum DeliveryStatus {

@@ -323,7 +323,7 @@ async function renderAccountDetail() {
                             <span>${formatDateTime(entry.bookedAt)}</span>
                         </div>
                         <span class="ledger-amount ${isCredit ? 'credit' : 'debit'}">
-                            ${isCredit ? '+' : '−'}${formatCurrency(entry.amount)}
+                            ${isCredit ? '+' : ''}${formatCurrency(entry.amount)}
                         </span>
                     </div>
                 `;

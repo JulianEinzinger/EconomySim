@@ -138,28 +138,23 @@ export class CreditScoreService {
         let totalWeight = 0;
         let achievedWeight = 0;
 
+        const now = new Date();
         for (const installment of installments) {
-
-            totalWeight += 1;
-
-            // Komplett ausgefallen
-            if (
-                installment.status === PaymentStatus.OVERDUE &&
-                !installment.paidAt
-            ) {
-                continue;
+            if (installment.dueDate > now) {
+                continue; // Noch nicht fällig -> keine Bewertung
             }
 
+            totalWeight ++;
+
             if (!installment.paidAt) {
-                console.log("NO PAY DATE");
-                continue;
+                continue; // fällig, aber nicht bezahlt -> keine Punkte
             }
 
             const lateDays = Math.max(0, Math.floor((installment.paidAt.getTime() -installment.dueDate.getTime()) / 86400000));
 
             if (lateDays === 0) {
                 achievedWeight += 1.0;
-            }
+            }   
             else if (lateDays <= 7) {
                 achievedWeight += 0.9;
             }
@@ -174,7 +169,9 @@ export class CreditScoreService {
             }
         }
 
-        console.log(`Achieved Weight: ${achievedWeight} | Total Weight: ${totalWeight}`);
+        if (totalWeight === 0) {
+            return 75; // No paid installments => neutral score
+        }
         return Math.round((achievedWeight / totalWeight) * 100);
     }
 }

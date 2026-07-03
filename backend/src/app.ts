@@ -11,11 +11,11 @@ import { orderRouter } from "./router/orderRouter.js";
 import { WholesalerService } from "./services/wholesalerService.js";
 import { mailRouter } from "./router/mailRouter.js";
 import { MailService } from "./services/mailService.js";
+import cron from "node-cron";
 import { bankRouter } from "./router/bankRouter.js";
 import { LoanService } from "./services/loanService.js";
 import { AccountService } from "./services/accountService.js";
 import { TransactionService } from "./services/transactionService.js";
-
 
 const PORT = 3000;
 
@@ -45,6 +45,21 @@ const wholesalerService: WholesalerService = new WholesalerService();
 // ensure central bank account exists
 await AccountService.getInstance().ensureCentralBankAccountExists();
 
+// Daily cron job
+// every day at midnight
+cron.schedule("0 0 * * *", async () => {
+    try {
+        console.log("Running daily midnight job...");
+
+        // check for overdue orders and send reminder emails
+        await wholesalerService.sendPaymentReminders();
+        // check for overdue loan installments and update their status + send mails
+        await LoanService.getInstance().processOverdueInstallments();
+    } catch (error) {
+        console.error(`Daily cron job failed: ${error}`);
+    }
+});
+
 // Game Loop
 // every minute
 const gameLoop = async () => {
@@ -53,14 +68,12 @@ const gameLoop = async () => {
         await wholesalerService.processOverdueOrders();
         // check delivery times and update order status if necessary
         await wholesalerService.processDeliveredOrders();
-        // check for overdue loan installments and update their status + send mails
-        await LoanService.getInstance().processOverdueInstallments();
         // complete pending transactions
         await TransactionService.getInstance().completePendingTransactions();
         // check for fully paid loans and update their status
         await LoanService.getInstance().processPaidLoans();
     } catch (error) {
-        
+        console.error(`Game loop failed: ${error}`);
     }
 
     setTimeout(gameLoop, 60000);

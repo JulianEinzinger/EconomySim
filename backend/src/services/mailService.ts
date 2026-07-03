@@ -275,7 +275,17 @@ export type MailTemplate_InstallmentReminderData = {
     bankIban: string
 }
 
+export type MailTemplate_PaymentReminderData = {
+    wholesalerName: string,
+    companyName: string,
+    orderId: number,
+    dueDate: string,
+    amountDue: number,
+    orderUrl: string
+}
+
 export type MailTemplates = {
     "order-confirmation": MailTemplate_OrderConfirmationData;
     "installment-reminder": MailTemplate_InstallmentReminderData;
+    "payment-reminder": MailTemplate_PaymentReminderData;
 };

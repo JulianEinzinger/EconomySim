@@ -1,9 +1,10 @@
 import { Router, type Request, type Response } from "express";
 import { WholesalerService } from "../services/wholesalerService.js";
-import type { Wholesaler, WholesalerOrderItem } from "@economysim/shared";
+import type { Company, Wholesaler, WholesalerOrder, WholesalerOrderItem } from "@economysim/shared";
 import { StatusCodes } from "http-status-codes";
 import { authenticateToken } from "../services/authService.js";
 import { CompanyService } from "../services/companyService.js";
+import { MailService } from "../services/mailService.js";
 
 export const wholesalerRouter = Router();
 
@@ -33,6 +34,29 @@ wholesalerRouter.post("/purchase", authenticateToken, async (req: Request, res: 
     const result = await service.createOrder(companyId, wholesalerId, items);
 
     if(result.success) {
+        // Bestellbestätigung senden
+        const wholesalerService: WholesalerService = new WholesalerService();
+        const order: WholesalerOrder | null = await service.getOrderById(result.orderId);
+        const wholesaler: Wholesaler | undefined = (await wholesalerService.getAllWholesalers())?.find(w => w.id === wholesalerId);
+        const companyName: string = ((await companyService.getCompanyByIdForUser(companyId, userId)) as any as Company).name; // ist fix eine company
+
+        if(!order) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Order was not created...' });
+        }
+
+        if(!wholesaler) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Couldn\'t find wholesaler...' });
+        }
+
+        const mailService: MailService = new MailService();
+
+        await mailService.createMail(companyId, wholesaler.name, `Order Confirmation #${result.orderId}`, 'order-confirmation', {
+            orderId: result.orderId,
+            wholesalerName: wholesaler.name,
+            companyName: companyName,
+            products: order.items,
+            totalPrice: order.totalPrice
+        });
         res.status(StatusCodes.OK).json({ message: `Purchase successful! (${result.orderId})` });
     } else {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error processing purchase!' });

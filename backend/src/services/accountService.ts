@@ -1,4 +1,4 @@
-import type { Account, AccountRow, AccountType, LedgerEntry, LedgerEntryRow } from "@economysim/shared";
+import { AccountType, type Account, type AccountRow, type LedgerEntry, type LedgerEntryRow } from "@economysim/shared";
 import type { Connection } from "oracledb";
 import { getDBConnection } from "../data.js";
 import { GameConfig } from "../gameConfig.js";
@@ -251,7 +251,7 @@ export class AccountService {
                 iban: GameConfig.CENTRAL_BANK_ACCOUNT_IBAN,
                 name: "Central Bank Account",
                 company_id: null,
-                account_type: "CENTRAL_BANK",
+                account_type: AccountType.CENTRAL_BANK,
                 balance: GameConfig.BASE_CAPITAL,
                 currency: 'EUR'
             });

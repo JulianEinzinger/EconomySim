@@ -289,7 +289,8 @@ export type MailRow = {
 export enum AccountType {
     GIRO = "GIRO",
     SAVINGS = "SAVINGS",
-    FIXED_DEPOSIT = "FIXED_DEPOSIT"
+    FIXED_DEPOSIT = "FIXED_DEPOSIT",
+    CENTRAL_BANK = "CENTRAL_BANK"
 }
 
 export type Account = {

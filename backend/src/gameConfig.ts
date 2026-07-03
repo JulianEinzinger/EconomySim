@@ -16,6 +16,7 @@ export class GameConfig {
     }
 
     public static CENTRAL_BANK_ACCOUNT_IBAN = "CENTRALBANK000000000";
+    public static GAME_SYSTEM_ACCOUNT_IBAN = "AT12ECONOMYSIM";
 
     public static async getAvailableLendingCapacity(): Promise<number> {
         try {

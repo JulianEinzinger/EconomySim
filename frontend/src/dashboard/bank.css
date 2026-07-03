@@ -193,6 +193,10 @@
     align-items: start;
 }
 
+.balance-negative {
+    color: #c23c43 !important;
+}
+
 @media (max-width: 900px) {
     .title-actions {
         width: 100%;

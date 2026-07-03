@@ -214,7 +214,7 @@ function renderSummary() {
     summaryGrid.innerHTML = `
         <article class="summary-tile">
             <span class="summary-label">Total balance</span>
-            <span class="summary-value">${formatCurrency(totalBalance)}</span>
+            <span class="summary-value ${totalBalance < 0 ? 'balance-negative' : ''}">${formatCurrency(totalBalance)}</span>
             <span class="summary-caption">${state.accounts.length} account${state.accounts.length === 1 ? '' : 's'}</span>
         </article>
         <article class="summary-tile">
@@ -244,6 +244,11 @@ function updateSidebarBalance(totalBalance) {
     const sidebarBalanceText = document.getElementById('sidebar-balance-text');
     if (sidebarBalanceText) {
         sidebarBalanceText.textContent = formatCurrency(totalBalance);
+        if (totalBalance < 0) {
+            sidebarBalanceText.classList.add('balance-negative');
+        } else {
+            sidebarBalanceText.classList.remove('balance-negative');
+        }
     }
 }
 
@@ -267,7 +272,7 @@ function renderAccounts() {
             <td><strong>${escapeHtml(account.name)}</strong></td>
             <td><span class="secondary-text">${formatIban(account.iban)}</span></td>
             <td><span class="account-type-badge">${escapeHtml(account.accountType)}</span></td>
-            <td><strong>${formatCurrency(account.balance)}</strong></td>
+            <td><strong class="${account.balance < 0 ? 'balance-negative' : ''}">${formatCurrency(account.balance)}</strong></td>
         </tr>
     `).join('');
 
@@ -294,7 +299,7 @@ async function renderAccountDetail() {
     accountNameEl.textContent = account.name;
     accountMetaEl.textContent = `${formatIban(account.iban)} • ${account.currency ?? 'EUR'}`;
     accountMetadata.innerHTML = `
-        <div><dt>Balance</dt><dd>${formatCurrency(account.balance)}</dd></div>
+        <div><dt>Balance</dt><dd class="${account.balance < 0 ? 'balance-negative' : ''}">${formatCurrency(account.balance)}</dd></div>
         <div><dt>Account type</dt><dd>${escapeHtml(account.accountType)}</dd></div>
         <div><dt>Opened</dt><dd>${formatDate(account.createdAt)}</dd></div>
         <div><dt>Currency</dt><dd>${escapeHtml(account.currency ?? 'EUR')}</dd></div>

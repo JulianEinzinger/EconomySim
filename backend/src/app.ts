@@ -42,8 +42,8 @@ app.listen(PORT, () => console.log(`Server listening on: http://localhost:${PORT
 
 const wholesalerService: WholesalerService = new WholesalerService();
 
-// ensure central bank account exists
-await AccountService.getInstance().ensureCentralBankAccountExists();
+// ensure game accounts exist
+await AccountService.getInstance().ensureGameAccountsExist();
 
 // Daily cron job
 // every day at midnight

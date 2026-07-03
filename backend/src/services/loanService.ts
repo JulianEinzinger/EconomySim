@@ -269,15 +269,31 @@ export class LoanService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result = await connection.execute(`UPDATE es_loan_installments SET status = :overdue_status WHERE status = :pending_status AND due_date <= :now`, {
+            const overdueInstallments = (
+                await connection.execute<LoanInstallmentRow & { 
+                    COMPANY_ID: number, 
+                    COMPANY_NAME: string 
+                }>(
+                    `SELECT li.*, b.company_id, c.name AS company_name 
+                    FROM es_loan_installments li 
+                    JOIN es_loans l ON li.loan_id = l.id 
+                    JOIN es_bank_accounts b ON l.iban = b.iban 
+                    JOIN es_companies c ON b.company_id = c.id 
+                    WHERE li.status = :pending_status 
+                        AND li.due_date <= :now`,
+                    {
+                        pending_status: PaymentStatus.PENDING,
+                        now: new Date()
+                    }
+                )
+            ).rows ?? [];
+
+            await connection.execute(`UPDATE es_loan_installments SET status = :overdue_status WHERE status = :pending_status AND due_date <= :now`, {
                 overdue_status: PaymentStatus.OVERDUE,
                 pending_status: PaymentStatus.PENDING,
                 now: new Date()
             });
-            const overdueInstallments = (await connection.execute<LoanInstallment&{ COMPANY_ID: number, COMPANY_NAME: string }>(`SELECT li.*, b.company_id, c.name AS company_name FROM es_loan_installments li JOIN es_loans l ON li.loan_id = l.id JOIN es_bank_accounts b ON l.iban = b.iban JOIN es_companies c ON b.company_id = c.id WHERE li.status = :pending_status AND li.due_date <= :now`, {
-                pending_status: PaymentStatus.PENDING,
-                now: new Date()
-            })).rows ?? [];
+            
 
             await connection.commit();
             await connection.close();
@@ -286,9 +302,9 @@ export class LoanService {
                 await MailService.getInstance().createMail<'installment-reminder'>(installment.COMPANY_ID, `Bank`, `Payment reminder`, 'installment-reminder', {
                     bankName: 'Sparkasse Oberösterreich Bank AG',
                     wholesalerName: installment.COMPANY_NAME,
-                    loanNumber: installment.loanId.toString(),
-                    dueDate: MailService.formatDate(installment.dueDate),
-                    installmentAmount: installment.totalAmount,
+                    loanNumber: installment.LOAN_ID.toString(),
+                    dueDate: MailService.formatDate(installment.DUE_DATE),
+                    installmentAmount: installment.TOTAL_AMOUNT,
                     bankIban: GameConfig.CENTRAL_BANK_ACCOUNT_IBAN
                 });
             }

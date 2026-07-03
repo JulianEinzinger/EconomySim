@@ -148,7 +148,6 @@ export class CompanyService {
                 name: row.NAME,
                 ownerId: row.OWNERID,
                 businessTypeId: row.BUSINESS_TYPE_ID,
-                balance: row.BALANCE
             });
         } catch(err) {
             console.error(`Error fetching company by ID for user: ${err}`);

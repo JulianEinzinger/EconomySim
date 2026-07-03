@@ -3,6 +3,8 @@ import { authenticateDev } from "../services/authService.js";
 import { StatusCodes } from "http-status-codes";
 import { ItemService } from "../services/itemService.js";
 import { WholesalerService } from "../services/wholesalerService.js";
+import { GameConfig } from "../gameConfig.js";
+import { CreditScoreService } from "../services/creditScoreService.js";
 
 export const devRouter = Router();
 
@@ -38,4 +40,22 @@ devRouter.get("/delivery-date", authenticateDev, async (req: Request, res: Respo
 
     const deliveryDate = await service.calculateDeliveryDate(wholesalerId, companyId);
     res.status(StatusCodes.OK).json({ deliveryDate: deliveryDate });
+});
+
+devRouter.get("/bank-capacity", authenticateDev, async (req: Request, res: Response) => {
+    const cap: number = await GameConfig.getAvailableLendingCapacity();
+
+    res.status(StatusCodes.OK).json({ LendingCapacity: cap });
+});
+
+devRouter.get("/creditscore", authenticateDev, async (req: Request, res: Response) => {
+    const creditScore: number = await CreditScoreService.getInstance().recalculateScore(Number(req.query.companyId));
+
+    res.status(StatusCodes.OK).json({ CreditScore: creditScore });
+});
+
+devRouter.get("/rate", authenticateDev, async (req: Request, res: Response) => {
+    const interestRate: number = await CreditScoreService.getInstance().getInterestRateForCompany(Number(req.query.companyId));
+
+    res.status(StatusCodes.OK).json({ "Interest Rate": interestRate });
 });

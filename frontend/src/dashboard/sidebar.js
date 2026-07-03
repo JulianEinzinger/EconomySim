@@ -2,7 +2,6 @@ const companyId = localStorage.getItem('current-company-id');
 
 const companyTitle = document.querySelector('.sidebar-title div');
 
-const balanceDisplay = document.querySelector('.balance-display');
 
 const token = localStorage.getItem('token');
 try {
@@ -15,9 +14,7 @@ try {
 
     if(companyRes.ok) {
         const companyInfo = await companyRes.json();
-    
         companyTitle.innerHTML += companyInfo.name;
-        balanceDisplay.innerHTML += `${companyInfo.balance?.toLocaleString('de-DE')}€`;
     }
 } catch (error) {
     console.error(`Error while loading company data: ${error}`);

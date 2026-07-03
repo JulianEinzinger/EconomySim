@@ -12,7 +12,7 @@ import { WholesalerService } from "./services/wholesalerService.js";
 import { mailRouter } from "./router/mailRouter.js";
 import { MailService } from "./services/mailService.js";
 import cron from "node-cron";
-
+import { bankRouter } from "./router/bankRouter.js";
 
 const PORT = 3000;
 
@@ -30,6 +30,7 @@ app.use("/dev", devRouter);
 app.use("/wholesalers", wholesalerRouter);
 app.use("/orders", orderRouter);
 app.use("/mails", mailRouter);
+app.use("/bank", bankRouter);
 
 app.use(express.static("resources"))
 

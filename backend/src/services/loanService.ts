@@ -339,4 +339,24 @@ export class LoanService {
 
         return installments;
     }
+
+    async processPaidLoans(): Promise<void> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result = await connection.execute(`UPDATE es_loans SET status = :paid_off_status WHERE status = :active_status AND remaining_balance <= 0`, {
+                paid_off_status: LoanStatus.PAID_OFF,
+                active_status: LoanStatus.ACTIVE
+            });
+
+            await connection.commit();
+            await connection.close();
+
+            if (result.rowsAffected) {
+                console.log(`Processed ${result.rowsAffected} paid loans and updated their status to PAID_OFF.`);
+            }
+        } catch (err) {
+            console.error(`Something happened while trying to process paid loans: ${err}`);
+        }
+    }
 }

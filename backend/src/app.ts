@@ -57,6 +57,8 @@ const gameLoop = async () => {
         await LoanService.getInstance().processOverdueInstallments();
         // complete pending transactions
         await TransactionService.getInstance().completePendingTransactions();
+        // check for fully paid loans and update their status
+        await LoanService.getInstance().processPaidLoans();
     } catch (error) {
         
     }

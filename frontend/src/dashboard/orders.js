@@ -96,7 +96,7 @@ function normalizeItem(item) {
 function normalizePaymentStatus(status) {
     const normalized = String(status ?? "").trim().toUpperCase().replaceAll(" ", "_");
     switch(normalized) {
-        case "PAYED":
+        case "PAID":
             return "PAID";
             break;
         case "OVERDUE":

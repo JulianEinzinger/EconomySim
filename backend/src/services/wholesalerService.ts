@@ -2,6 +2,7 @@ import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER, BIND_IN } = oracledb;
 import { DeliveryStatus, PaymentStatus, type Wholesaler, type WholesalerOrder, type WholesalerOrderItem, type WholesalerOrderItemRow, type WholesalerOrderRow, type WholesalerProduct, type WholesalerRow } from "@economysim/shared";
 import { getDBConnection } from "../data.js";
+import { TransactionService } from "./transactionService.js";
 
 export class WholesalerService {
 
@@ -400,9 +401,13 @@ FROM es_wholesalers w
             if(!order) return;
             const totalPrice = order.totalPrice;
 
-            // Todo: Betrag abbuchen
+            const wholesalerIban = 'AT12ECONOMYSIM'; // General IBAN for economysim systems
 
-            await this.updatePaymentStatus(orderId, PaymentStatus.PAID);
+            const result = await TransactionService.getInstance().transfer(iban, wholesalerIban, totalPrice, `Payment for order #${orderId}`);
+
+            if (result) {
+                await this.updatePaymentStatus(orderId, PaymentStatus.PAID);
+            }
         } catch (err) {
             console.error(`Something happened while trying to pay order #${orderId}: ${err}`);
         }

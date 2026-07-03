@@ -21,7 +21,9 @@ export class GameConfig {
         try {
             const connection: Connection = await getDBConnection();
 
-            const depositsResult = await connection.execute<{ TOTAL_DEPOSITS: number }>(`SELECT SUM(balance) AS total_deposits FROM es_bank_accounts`);
+            const depositsResult = await connection.execute<{ TOTAL_DEPOSITS: number }>(`SELECT SUM(balance) AS total_deposits FROM es_bank_accounts WHERE account_type != :central_bank_type`, {
+                central_bank_type: AccountType.CENTRAL_BANK
+            });
             const totalDeposits: number = (depositsResult.rows && depositsResult.rows[0]?.TOTAL_DEPOSITS) ?? 0;
 
             const reservesResult = await connection.execute<{ TOTAL_RESERVES: number }>(`

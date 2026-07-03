@@ -243,6 +243,11 @@ export class AccountService {
         }));        
     }
 
+    public async ensureGameAccountsExist(): Promise<void> {
+        await this.ensureCentralBankAccountExists();
+        await this.ensureGameSystemAccountExists();
+    }
+
     public async ensureCentralBankAccountExists(): Promise<void> {
         try {
             const connection: Connection = await getDBConnection();
@@ -260,6 +265,26 @@ export class AccountService {
             await connection.close();
         } catch (err) {
             console.error("Central bank account already exists");
+        }
+    }
+
+    public async ensureGameSystemAccountExists(): Promise<void> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            await connection.execute(`INSERT INTO es_bank_accounts (iban, name, company_id, account_type, balance, currency) VALUES (:iban, :name, :company_id, :account_type, :balance, :currency)`, {
+                iban: GameConfig.GAME_SYSTEM_ACCOUNT_IBAN,
+                name: "Game System Account",
+                company_id: null,
+                account_type: AccountType.CENTRAL_BANK,
+                balance: 0,
+                currency: 'EUR'
+            });
+
+            await connection.commit();
+            await connection.close();
+        } catch (err) {
+            console.error("Game system account already exists");
         }
     }
 }

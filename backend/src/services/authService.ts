@@ -15,6 +15,8 @@ export interface TokenPayload {
     userId: number;
 }
 
+const DEV_TOKEN = process.env.DEV_TOKEN;
+
 /**
  * Authenticates a JWT token from the Authorization header. If the token is valid, it attaches the user information to the request object and calls the next middleware. If the token is missing or invalid, it sends an appropriate HTTP status code.
  * @param req 
@@ -33,11 +35,16 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
         req.user = { username: payload.username, userId: payload.userId };
         next();
     } catch(err) {
-        return res.sendStatus(StatusCodes.FORBIDDEN);
+        if(token === DEV_TOKEN) {
+            req.user = { username: 'DEV', userId: -1 };
+            next();
+        } else {
+            return res.sendStatus(StatusCodes.FORBIDDEN);
+        }
     }
 };
 
-const DEV_TOKEN = process.env.DEV_TOKEN;
+
 
 /**
  * Authenticates a development token from the Authorization header. If the token matches the expected development token, it calls the next middleware. If the token is missing or does not match, it sends an appropriate HTTP status code.

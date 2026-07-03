@@ -133,7 +133,7 @@ export class CompanyService {
 
             const connection: Connection = await getDBConnection();
 
-            const rows: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT c.id, c.name, c.ownerid, c.business_type_id, b.balance FROM es_companies c LEFT JOIN es_bank_accounts b ON c.bank_account_id = b.id WHERE c.id = :companyId", {
+            const rows: CompanyRow[] = (await connection.execute<CompanyRow>("SELECT c.id, c.name, c.ownerid, c.business_type_id FROM es_companies c WHERE c.id = :companyId", {
                 companyId: companyId
             })).rows ?? [];
 
@@ -148,7 +148,6 @@ export class CompanyService {
                 name: row.NAME,
                 ownerId: row.OWNERID,
                 businessTypeId: row.BUSINESS_TYPE_ID,
-                balance: row.BALANCE
             });
         } catch(err) {
             console.error(`Error fetching company by ID for user: ${err}`);

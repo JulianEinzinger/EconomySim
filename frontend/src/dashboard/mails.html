@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Mails</title>
 
-    <!-- Montserrat Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap">
-
-    <!-- Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="orders.css"> <!-- Re-use CSS -->
 </head>
 <body>
     <div class="grid-container">
@@ -20,7 +17,7 @@
                 <span class="material-icons-outlined">menu</span>
             </div>
             <div class="header-left">
-                <span class="material-icons-outlined">search</span>
+                <!-- Could be added a search bar here in the future -->
             </div>
             <div class="header-right">
                 <span class="material-icons-outlined">notifications</span>
@@ -35,6 +32,10 @@
                     <span class="material-icons-outlined">inventory</span>
                 </div>
                 <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <div class="balance-display">
+                <span class="material-icons-outlined">account_balance_wallet</span>
             </div>
 
             <ul class="sidebar-list">
@@ -93,42 +94,85 @@
 
         <main class="main-container">
             <div class="main-title">
-                <p class="font-weight-bold">DASHBOARD</p>
+                <div>
+                    <p class="font-weight-bold">MAILS</p>
+                    <span class="subtitle">View and manage incoming mails.</span>
+                </div>
             </div>
-                <div class="main-cards">
-                    <div class="card">
-                        <div class="card-inner">
-                            <p class="text-primary">SOLD ITEMS · 24h</p>
-                            <span class="material-icons-outlined text-blue">inventory_2</span>    
-                        </div>
-                        <span class="text-primary font-weight-bold">23</span>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <p class="text-primary">SALES · 24h</p>
-                            <span class="material-icons-outlined text-orange">sell</span>    
-                        </div>
-                        <span class="text-primary font-weight-bold">93,-</span>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <p class="text-primary">PROFIT · 24h</p>
-                            <span class="material-icons-outlined text-green">shopping_cart</span>    
-                        </div>
-                        <span class="text-primary font-weight-bold">57,40</span>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <p class="text-primary">LOW STOCK ITEMS</p>
-                            <span class="material-icons-outlined text-red">notification_important</span>    
-                        </div>
-                        <span class="text-primary font-weight-bold">2</span>
+
+            <section class="panel controls-panel">
+                <div class="controls-row">
+                    <label class="control">
+                        <span>Search</span>
+                        <input id="search-input" type="search" placeholder="Sender or subject">
+                    </label>
+
+                    <label class="control">
+                        <span>Status</span>
+                        <select id="status-filter">
+                            <option value="ALL">Newest first</option>
+                            <option value="UNREAD">Unread</option>
+                            <option value="READ">Read</option>
+                        </select>
+                    </label>
+
+                    <label class="control">
+                        <span>Sort by</span>
+                        <select id="sort-select">
+                            <option value="DATE_DESC">Newest</option>
+                            <option value="DATE_ASC">Oldest</option>
+                        </select>
+                    </label>
+                </div>
+            </section>
+
+            <section class="content-grid">
+                <div class="panel table-panel">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>From</th>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mails-body"></tbody>
+                    </table>
+
+                    <div class="empty-state hidden"  id="empty-state">
+                        <span class="material-icons-outlined">mail</span>
+                        <p>No mails found.</p>
                     </div>
                 </div>
-        </main>
-    </div>
 
-    <script src="dashboard.js" type="module"></script>
+                <aside class="panel detail-panel">
+                    <div id="detail-placeholder" class="detail-placeholder">
+                        <span class="material-icons-outlined">touch_app</span>
+                        <p>Select a mail to read it.</p>
+                    </div>
+
+                    <div id="detail-content" class="detail-content hidden">
+                        <div class="detail-header">
+                            <div>
+                                <h2 id="mail-subject"></h2>
+                                <p id="mail-meta"></p>
+                            </div>
+                            <button id="delete-btn" class="delete-btn hidden"> 
+                                <span class="material-icons-outlined">delete</span>
+                                Delete
+                            </button>
+                        </div>
+
+                        <div class="detail-section">
+                            <p id="mail-body"></p>
+                        </div>
+                    </div>
+                </aside>
+            </section>
+        </main>
+
+    <script src="mails.js" type="module"></script>
     <script src="sidebar.js" type="module"></script>
 </body>
 </html>

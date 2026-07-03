@@ -2,6 +2,7 @@ import oracledb, { type Connection, type Result } from "oracledb";
 const { BIND_OUT, NUMBER, BIND_IN } = oracledb;
 import { DeliveryStatus, PaymentStatus, type Wholesaler, type WholesalerOrder, type WholesalerOrderItem, type WholesalerOrderItemRow, type WholesalerOrderRow, type WholesalerProduct, type WholesalerRow } from "@economysim/shared";
 import { getDBConnection } from "../data.js";
+import { TransactionService } from "./transactionService.js";
 import { MailService } from "./mailService.js";
 
 export class WholesalerService {
@@ -392,21 +393,22 @@ FROM es_wholesalers w
     /**
      * Processes the payment for a specific order using the provided bank account ID. It checks if the order exists and verifies if the bank account has sufficient balance. If the payment is successful, it updates the payment status.
      * @param orderId 
-     * @param bankAccountId 
+     * @param iban 
      * @returns 
      */
-    async payOrder(orderId: number, bankAccountId: number): Promise<void> {
+    async payOrder(orderId: number, iban: string): Promise<void> {
         try {
             const order = await this.getOrderById(orderId);
             if(!order) return;
             const totalPrice = order.totalPrice;
-            // TODO check if bank account balance is sufficient
-            const isSufficient = true;
-            if(!isSufficient) return;
 
-            // Todo: Betrag abbuchen
+            const wholesalerIban = 'AT12ECONOMYSIM'; // General IBAN for economysim systems
 
-            await this.updatePaymentStatus(orderId, PaymentStatus.PAYED);
+            const result = await TransactionService.getInstance().transfer(iban, wholesalerIban, totalPrice, `Payment for order #${orderId}`);
+
+            if (result) {
+                await this.updatePaymentStatus(orderId, PaymentStatus.PAID);
+            }
         } catch (err) {
             console.error(`Something happened while trying to pay order #${orderId}: ${err}`);
         }

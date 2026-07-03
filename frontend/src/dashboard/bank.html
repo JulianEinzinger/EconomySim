@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <link rel="stylesheet" href="orders.css">
+    <link rel="stylesheet" href="bank.css">
+</head>
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+            <div class="header-left"></div>
+            <div class="header-right">
+                <span class="material-icons-outlined">notifications</span>
+                <span class="material-icons-outlined">mail</span>
+                <span class="material-icons-outlined">account_circle</span>
+            </div>
+        </header>
+
+        <aside id="sidebar">
+            <div class="sidebar-title">
+                <div class="sidebar-logo">
+                    <span class="material-icons-outlined">inventory</span>
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <ul class="sidebar-list">
+                <li>
+                    <a href="dashboard.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">dashboard</span> Dashboard
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="inventory.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">warehouse</span> Inventory
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="bank.html">
+                        <div class="sidebar-list-item is-active">
+                            <span class="material-icons-outlined">account_balance</span> Bank
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="purchase.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">add_shopping_cart</span> Purchase
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="orders.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">receipt_long</span> Orders
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="settings.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">settings</span> Settings
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="mails.html">
+                        <div class="sidebar-list-item">
+                            <span class="material-icons-outlined">mail</span> Mails
+                            <span id="mail-unread-count-badge" class="badge hidden">0</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-container">
+            <div class="main-title">
+                <div>
+                    <p class="font-weight-bold">BANK</p>
+                    <span class="subtitle">Manage accounts, view transactions, and handle company loans.</span>
+                </div>
+                <div class="title-actions">
+                    <button class="btn-secondary" id="new-account-btn">
+                        <span class="material-icons-outlined">add</span>
+                        New account
+                    </button>
+                    <button class="btn-primary" id="apply-loan-btn">
+                        <span class="material-icons-outlined">request_quote</span>
+                        Apply for loan
+                    </button>
+                </div>
+            </div>
+
+            <section class="summary-grid" id="summary-grid"></section>
+
+            <section class="panel bank-tabs">
+                <button class="tab-btn is-active" data-tab="accounts">Accounts</button>
+                <button class="tab-btn" data-tab="loans">Loans</button>
+            </section>
+
+            <section class="tab-panel is-active" id="accounts-panel">
+                <section class="content-grid">
+                    <div class="panel table-panel">
+                        <div class="panel-heading">
+                            <h3>Your accounts</h3>
+                        </div>
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Account</th>
+                                    <th>IBAN</th>
+                                    <th>Type</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accounts-body"></tbody>
+                        </table>
+                        <div class="empty-state hidden" id="accounts-empty">
+                            <span class="material-icons-outlined">account_balance</span>
+                            <p>No accounts yet. Open your first business account to get started.</p>
+                            <button class="btn-primary" id="empty-create-account-btn">
+                                <span class="material-icons-outlined">add</span>
+                                Create account
+                            </button>
+                        </div>
+                    </div>
+
+                    <aside class="panel detail-panel">
+                        <div class="detail-placeholder" id="account-placeholder">
+                            <span class="material-icons-outlined">touch_app</span>
+                            <p>Select an account to view details and transactions.</p>
+                        </div>
+                        <div class="detail-content hidden" id="account-detail">
+                            <div class="detail-header">
+                                <div>
+                                    <h2 id="account-name"></h2>
+                                    <p id="account-meta"></p>
+                                </div>
+                            </div>
+
+                            <dl class="detail-metadata" id="account-metadata"></dl>
+
+                            <div class="detail-section">
+                                <div class="section-heading">
+                                    <h3>Recent transactions</h3>
+                                </div>
+                                <div class="ledger-list" id="ledger-list"></div>
+                                <div class="empty-state hidden ledger-empty" id="ledger-empty">
+                                    <span class="material-icons-outlined">receipt</span>
+                                    <p>No transactions on this account yet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </section>
+            </section>
+
+            <section class="tab-panel hidden" id="loans-panel">
+                <section class="content-grid loans-grid">
+                    <div class="panel table-panel">
+                        <div class="panel-heading">
+                            <h3>Active loans</h3>
+                        </div>
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Loan</th>
+                                    <th>Type</th>
+                                    <th>Principal</th>
+                                    <th>Remaining</th>
+                                    <th>Rate</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="loans-body"></tbody>
+                        </table>
+                        <div class="empty-state hidden" id="loans-empty">
+                            <span class="material-icons-outlined">request_quote</span>
+                            <p>No loans yet. Apply for financing when you need capital.</p>
+                        </div>
+                    </div>
+
+                    <aside class="panel detail-panel">
+                        <div class="detail-placeholder" id="loan-placeholder">
+                            <span class="material-icons-outlined">touch_app</span>
+                            <p>Select a loan to view its repayment schedule.</p>
+                        </div>
+                        <div class="detail-content hidden" id="loan-detail">
+                            <div class="detail-header">
+                                <div>
+                                    <h2 id="loan-title"></h2>
+                                    <p id="loan-subtitle"></p>
+                                </div>
+                            </div>
+
+                            <dl class="detail-metadata" id="loan-metadata"></dl>
+
+                            <div class="detail-section">
+                                <div class="section-heading">
+                                    <h3>Installments</h3>
+                                </div>
+                                <div class="installment-list" id="installment-list"></div>
+                            </div>
+                        </div>
+                    </aside>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <!-- New Account Modal -->
+    <div class="modal-backdrop hidden" id="account-modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h2>Open new account</h2>
+                    <p>Create a giro account for your company.</p>
+                </div>
+                <button class="modal-close-btn" data-close-modal="account-modal-backdrop">
+                    <span class="material-icons-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label class="control">
+                    <span>Account name</span>
+                    <input id="account-name-input" type="text" placeholder="e.g. Operations Account" maxlength="60">
+                </label>
+                <p class="modal-hint" id="account-modal-error"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" data-close-modal="account-modal-backdrop">Cancel</button>
+                <button class="btn-primary" id="create-account-btn">
+                    <span class="material-icons-outlined">check_circle</span>
+                    Create account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apply for Loan Modal -->
+    <div class="modal-backdrop hidden" id="loan-modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h2>Apply for loan</h2>
+                    <p id="loan-modal-rate">Your current rate: —</p>
+                </div>
+                <button class="modal-close-btn" data-close-modal="loan-modal-backdrop">
+                    <span class="material-icons-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label class="control">
+                    <span>Disburse to account</span>
+                    <select id="loan-account-select"></select>
+                </label>
+                <label class="control">
+                    <span>Loan type</span>
+                    <select id="loan-type-select">
+                        <option value="OPERATING">Operating</option>
+                        <option value="INVESTMENT">Investment</option>
+                        <option value="BRIDGE">Bridge</option>
+                    </select>
+                </label>
+                <label class="control">
+                    <span>Amount (EUR)</span>
+                    <input id="loan-amount-input" type="number" min="1000" step="100" placeholder="10000">
+                </label>
+                <label class="control">
+                    <span>Term (months)</span>
+                    <select id="loan-term-select">
+                        <option value="6">6 months</option>
+                        <option value="12" selected>12 months</option>
+                        <option value="24">24 months</option>
+                        <option value="36">36 months</option>
+                    </select>
+                </label>
+                <p class="modal-hint" id="loan-modal-error"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" data-close-modal="loan-modal-backdrop">Cancel</button>
+                <button class="btn-primary" id="submit-loan-btn">
+                    <span class="material-icons-outlined">check_circle</span>
+                    Submit application
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="bank.js" type="module"></script>
+    <script src="sidebar.js" type="module"></script>
+</body>
+</html>

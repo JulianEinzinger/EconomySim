@@ -8,6 +8,23 @@ import Handlebars from "handlebars";
 oracledb.fetchAsString = [oracledb.CLOB];
 
 export class MailService {
+    //#region Singleton
+    private static instance: MailService;
+
+    private constructor() {
+        // Private constructor to prevent instantiation
+    }
+
+    public static getInstance(): MailService {
+        if(!MailService.instance) {
+            MailService.instance = new MailService();
+        }
+
+        return MailService.instance;
+    }
+
+    //#endregion
+
 
     static formatDate(date: Date): string {
         return new Intl.DateTimeFormat("de-AT", {

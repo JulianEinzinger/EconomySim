@@ -1,12 +1,14 @@
-import { LoanStatus, PaymentStatus, type Account, type InstallmentDraft, type Loan, type LoanInstallment, type LoanRow, type LoanType } from "@economysim/shared";
-import { BIND_OUT, NUMBER, type Connection } from "oracledb";
+import { LoanStatus, PaymentStatus, type InstallmentDraft, type Loan, type LoanInstallment, type LoanInstallmentRow, type LoanRow, type LoanType } from "@economysim/shared";
+import oracledb, { type Connection } from "oracledb";
+const { BIND_OUT, NUMBER } = oracledb;
 import { getDBConnection } from "../data.js";
 import { AccountService } from "./accountService.js";
 import { GameConfig } from "../gameConfig.js";
 import { CreditScoreService } from "./creditScoreService.js";
 import { TransactionService } from "./transactionService.js";
+import { MailService } from "./mailService.js";
 
-class LoanService {
+export class LoanService {
     //#region Singleton
     private static instance: LoanService;
 
@@ -24,63 +26,81 @@ class LoanService {
 
     //#endregion
 
+    private roundMoney(value: number): number {
+        return Math.round(value * 100) / 100;
+    }
+
+    private toDbInterestRate(annualRatePercent: number): number {
+        return Math.round(annualRatePercent * 100) / 10000;
+    }
+
+    private toApiInterestRate(dbRate: number): number {
+        const rate = Number(dbRate ?? 0);
+        if (rate <= 1) {
+            return Math.round(rate * 10000) / 100;
+        }
+        return Math.round(rate * 100) / 100;
+    }
+
     async applyForLoan(companyId: number, iban: string, principal: number, loanType: LoanType, termMonths: number): Promise<void> {
+        const isAccountOwnedByCompany: boolean = await AccountService.getInstance().doesCompanyOwnAccount(iban, companyId);
+
+        if (!isAccountOwnedByCompany) {
+            throw new Error("Account not found");
+        }
+
+        const availableCapacity = await GameConfig.getAvailableLendingCapacity();
+
+        if (availableCapacity < principal) {
+            throw new Error("The central bank has not enough money at the moment");
+        }
+
+        const interestRate: number = await CreditScoreService.getInstance().getInterestRateForCompany(companyId);
+
+        const installments = this.generateInstallmentSchedule(principal, interestRate, termMonths);
+        const normalizedPrincipal = this.roundMoney(principal);
+
+        const connection: Connection = await getDBConnection();
+
         try {
-            const isAccountOwnedByCompany: boolean = await AccountService.getInstance().doesCompanyOwnAccount(iban, companyId);
-
-            if (!isAccountOwnedByCompany) {
-                throw new Error("Account not found");
-            }
-
-            const availableCapacity = await GameConfig.getAvailableLendingCapacity();
-
-            if (availableCapacity < principal) {
-                throw new Error("The central bank has not enough money at the moment");
-            }
-
-            const interestRate: number = await CreditScoreService.getInstance().getInterestRateForCompany(companyId);
-
-            const installments = this.generateInstallmentSchedule(principal, interestRate, termMonths);
-
-            // create the loan
-
-            const connection: Connection = await getDBConnection();
-
-            const loanResult = (await connection.execute<{ loanId: number }>(`INSERT INTO es_loans (iban, principal, remaining_balance, 
+            const result = await connection.execute<{ loanId: number }>(`INSERT INTO es_loans (iban, principal, remaining_balance, 
                 annual_interest_rate, loan_type, status, end_date) VALUES (:iban, :principal, :remaining_balance, :annual_interest_rate,
                 :loan_type, :status, :end_date) RETURNING id INTO :loanId`, {
                     iban,
-                    principal,
-                    remaining_balance: principal,
+                    principal: normalizedPrincipal,
+                    remaining_balance: normalizedPrincipal,
+                    annual_interest_rate: this.toDbInterestRate(interestRate),
                     loan_type: loanType,
                     status: LoanStatus.ACTIVE,
                     end_date: installments[installments.length - 1]?.dueDate,
                     loanId: { dir: BIND_OUT, type: NUMBER }
                 }
-            )).rows ?? [];
+            );
+
+            const loanId = (result.outBinds as unknown as { loanId: number[] }).loanId[0];
+
+            if (!loanId) {
+                throw new Error('Failed to create loan record');
+            }
 
             for(const installment of installments) {
                 await connection.execute(`INSERT INTO es_loan_installments (loan_id, due_date, principal_amount, interest_amount, total_amount,
                     remaining_balance, status) VALUES (:loan_id, :due_date, :principal_amount, :interest_amount, :total_amount, 
                     :remaining_balance, :status)`, {
-                    loan_id: loanResult[0]?.loanId,
+                    loan_id: loanId,
                     due_date: installment.dueDate,
-                    principal_amount: installment.principalAmount,
-                    interest_amount: installment.interestAmount,
-                    total_amount: installment.totalAmount,
-                    remaining_balance: installment.remainingBalance,
+                    principal_amount: this.roundMoney(installment.principalAmount),
+                    interest_amount: this.roundMoney(installment.interestAmount),
+                    total_amount: this.roundMoney(installment.totalAmount),
+                    remaining_balance: this.roundMoney(Math.max(installment.remainingBalance, 0)),
                     status: installment.status
                 });
             }
             await connection.commit();
+
+            await TransactionService.getInstance().transfer(GameConfig.CENTRAL_BANK_ACCOUNT_IBAN, iban, normalizedPrincipal, `Loan payout for loan (${loanId})`);
+        } finally {
             await connection.close();
-
-            // Kredit auszahlen
-            await TransactionService.getInstance().transfer(GameConfig.CENTRAL_BANK_ACCOUNT_IBAN, iban, principal, `Loan payout for loan (${loanResult[0]?.loanId})`);
-
-            // Lending capacity reduzieren ist redundant, da die Kapazität immer in Echtzeit aus den vergebenen Krediten berechnet wird.
-        } catch(err) {
-            console.error(`Something happened while applying for a loan for company ${companyId} with IBAN ${iban}:`, err);
         }
     }
 
@@ -104,7 +124,7 @@ class LoanService {
                 iban: lr.IBAN,
                 principal: lr.PRINCIPAL,
                 remainingBalance: lr.REMAINING_BALANCE,
-                annualInterestRate: lr.ANNUAL_INTEREST_RATE,
+                annualInterestRate: this.toApiInterestRate(lr.ANNUAL_INTEREST_RATE),
                 loanType: lr.LOAN_TYPE,
                 status: lr.STATUS,
                 startDate: lr.START_DATE,
@@ -121,6 +141,33 @@ class LoanService {
      * @param loanId 
      * @returns a loan object or undefined if an error occurs
      */
+    async getInstallmentsByLoanId(loanId: number): Promise<LoanInstallment[]> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result = (await connection.execute<LoanInstallmentRow>(`SELECT * FROM es_loan_installments WHERE loan_id = :loan_id ORDER BY due_date ASC`, {
+                loan_id: loanId
+            })).rows ?? [];
+
+            await connection.close();
+
+            return result.map(ir => ({
+                id: ir.ID,
+                loanId: ir.LOAN_ID,
+                dueDate: ir.DUE_DATE,
+                paidAt: ir.PAID_AT,
+                principalAmount: ir.PRINCIPAL_AMOUNT,
+                interestAmount: ir.INTEREST_AMOUNT,
+                totalAmount: ir.TOTAL_AMOUNT,
+                remainingBalance: ir.REMAINING_BALANCE,
+                status: ir.STATUS
+            }));
+        } catch (err) {
+            console.error(`Something happened while trying to retrieve installments for loan ${loanId}: ${err}`);
+            return [];
+        }
+    }
+
     async getLoanById(loanId: number): Promise<Loan | undefined> {
         try {
             const connection: Connection = await getDBConnection();
@@ -142,7 +189,7 @@ class LoanService {
                 iban: loan.IBAN,
                 principal: loan.PRINCIPAL,
                 remainingBalance: loan.REMAINING_BALANCE,
-                annualInterestRate: loan.ANNUAL_INTEREST_RATE,
+                annualInterestRate: this.toApiInterestRate(loan.ANNUAL_INTEREST_RATE),
                 loanType: loan.LOAN_TYPE,
                 status: loan.STATUS,
                 startDate: loan.START_DATE,
@@ -156,12 +203,24 @@ class LoanService {
     async payInstallment(installmentId: number, companyId: number): Promise<void> {
         try {
             const connection: Connection = await getDBConnection();
-            const installment = ((await connection.execute<LoanInstallment>(`SELECT * FROM es_loan_installments WHERE id = :installment_id`, {
+            const installmentRow = ((await connection.execute<LoanInstallmentRow>(`SELECT * FROM es_loan_installments WHERE id = :installment_id`, {
                 installment_id: installmentId
             })).rows ?? [])[0];
 
-            if (!installment) {
+            if (!installmentRow) {
                 throw new Error(`Loan Installment with id ${installmentId} was not found`);
+            }
+
+            const installment: LoanInstallment = {
+                id: installmentRow?.ID,
+                loanId: installmentRow?.LOAN_ID,
+                dueDate: installmentRow.DUE_DATE,
+                paidAt: installmentRow.PAID_AT,
+                principalAmount: installmentRow.PRINCIPAL_AMOUNT,
+                interestAmount: installmentRow.INTEREST_AMOUNT,
+                totalAmount: installmentRow.TOTAL_AMOUNT,
+                remainingBalance: installmentRow.REMAINING_BALANCE,
+                status: installmentRow.STATUS
             }
 
             const loan = await this.getLoanById(installment.loanId);
@@ -179,13 +238,13 @@ class LoanService {
 
             await TransactionService.getInstance().transfer(loan!.iban, GameConfig.CENTRAL_BANK_ACCOUNT_IBAN, installment.totalAmount, `Loan installment (${loan!.id})`);
 
-            await connection.execute(`UPDATE es_loan_installments SET status = :status, paid_at = :date WHERE id = :id`, {
+            await connection.execute(`UPDATE es_loan_installments SET status = :status, paid_at = :paid_at WHERE id = :id`, {
                 status: PaymentStatus.PAID,
-                date: new Date(),
+                paid_at: new Date(),
                 id: installmentId
             });
 
-            await connection.execute(`UPDATE es_loans SET remaining_balance = remainingBalance - :amount WHERE id = :id`, {
+            await connection.execute(`UPDATE es_loans SET remaining_balance = remaining_balance - :amount WHERE id = :id`, {
                 amount: installment.principalAmount,
                 id: installment.loanId
             });
@@ -210,14 +269,45 @@ class LoanService {
         try {
             const connection: Connection = await getDBConnection();
 
-            const result = await connection.execute(`UPDATE es_loan_installments SET status = :overdue_status WHERE status = :pending_status AND due_date <= :now`, {
+            const overdueInstallments = (
+                await connection.execute<LoanInstallmentRow & { 
+                    COMPANY_ID: number, 
+                    COMPANY_NAME: string 
+                }>(
+                    `SELECT li.*, b.company_id, c.name AS company_name 
+                    FROM es_loan_installments li 
+                    JOIN es_loans l ON li.loan_id = l.id 
+                    JOIN es_bank_accounts b ON l.iban = b.iban 
+                    JOIN es_companies c ON b.company_id = c.id 
+                    WHERE li.status = :pending_status 
+                        AND li.due_date <= :now`,
+                    {
+                        pending_status: PaymentStatus.PENDING,
+                        now: new Date()
+                    }
+                )
+            ).rows ?? [];
+
+            await connection.execute(`UPDATE es_loan_installments SET status = :overdue_status WHERE status = :pending_status AND due_date <= :now`, {
                 overdue_status: PaymentStatus.OVERDUE,
                 pending_status: PaymentStatus.PENDING,
                 now: new Date()
             });
+            
 
             await connection.commit();
             await connection.close();
+
+            for (const installment of overdueInstallments) {
+                await MailService.getInstance().createMail<'installment-reminder'>(installment.COMPANY_ID, `Bank`, `Payment reminder`, 'installment-reminder', {
+                    bankName: 'Sparkasse Oberösterreich Bank AG',
+                    wholesalerName: installment.COMPANY_NAME,
+                    loanNumber: installment.LOAN_ID.toString(),
+                    dueDate: MailService.formatDate(installment.DUE_DATE),
+                    installmentAmount: installment.TOTAL_AMOUNT,
+                    bankIban: GameConfig.CENTRAL_BANK_ACCOUNT_IBAN
+                });
+            }
         } catch (err) {
             console.error(`Something happened while trying to process overdue installments: ${err}`);
         }
@@ -264,5 +354,25 @@ class LoanService {
         }
 
         return installments;
+    }
+
+    async processPaidLoans(): Promise<void> {
+        try {
+            const connection: Connection = await getDBConnection();
+
+            const result = await connection.execute(`UPDATE es_loans SET status = :paid_off_status WHERE status = :active_status AND remaining_balance <= 0`, {
+                paid_off_status: LoanStatus.PAID_OFF,
+                active_status: LoanStatus.ACTIVE
+            });
+
+            await connection.commit();
+            await connection.close();
+
+            if (result.rowsAffected) {
+                console.log(`Processed ${result.rowsAffected} paid loans and updated their status to PAID_OFF.`);
+            }
+        } catch (err) {
+            console.error(`Something happened while trying to process paid loans: ${err}`);
+        }
     }
 }

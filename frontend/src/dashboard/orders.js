@@ -102,7 +102,7 @@ function normalizeItem(item) {
 function normalizePaymentStatus(status) {
     const normalized = String(status ?? "").trim().toUpperCase().replaceAll(" ", "_");
     switch(normalized) {
-        case "PAYED":
+        case "PAID":
             return "PAID";
             break;
         case "OVERDUE":
@@ -479,16 +479,27 @@ async function handlePayOrder() {
 
 async function loadBankAccounts() {
     try {
-        throw new Error('Account loading Not Yet Implemented!');
+        const response = await fetch(`http://localhost:3000/bank/accounts?companyId=${companyId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Bank accounts endpoint returned ${response.status}`);
+        }
+
+        const accounts = await response.json();
+
+        return accounts.map(account => ({
+            iban: account.iban,
+            name: account.name,
+            balance: Number(account.balance ?? 0)
+        }));
     } catch {
-        // Fallback-Data for development
-        
-        return [
-            { id: 1, name: "Main Business Account", iban: 'AT12 3456 7890 1234 5678', balance: 14350 },
-            { id: 2, name: "Operations Account", iban: 'AT98 7654 3210 9876 5432', balance: 26 }
-        ];
-        
-       return [];
+        return [];
     }
 }
 
@@ -501,7 +512,7 @@ function renderAccountList(accounts, orderTotal) {
     accountList.innerHTML = accounts.map(acc => {
         const insufficient = acc.balance < orderTotal;
         return `
-            <button class="account-option" data-account-id="${acc.id}" ${insufficient ? 'title="Insufficient balance"' : ''}>
+            <button class="account-option" data-account-iban="${escapeHtml(acc.iban)}" ${insufficient ? 'title="Insufficient balance"' : ''}>
                 <div class="account-icon">
                     <span class="material-icons-outlined">account_balance</span>
                 </div>
@@ -520,7 +531,7 @@ function renderAccountList(accounts, orderTotal) {
         btn.addEventListener("click", () => {
             accountList.querySelectorAll('.account-option').forEach(b => b.classList.remove('is-selected'));
             btn.classList.add('is-selected');
-            selectedAccountId = Number(btn.dataset.accountId);
+            selectedAccountId = btn.dataset.accountIban;
             modalConfirmBtn.disabled = false;
         });
     });

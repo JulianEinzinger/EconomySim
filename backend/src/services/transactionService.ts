@@ -1,4 +1,5 @@
-import type { Connection } from "oracledb";
+import oracledb, { type Connection } from "oracledb";
+const { BIND_OUT, NUMBER } = oracledb;
 import { getDBConnection } from "../data.js";
 import { LedgerEntryType, TransactionStatus, type Transaction, type TransactionRow } from "@economysim/shared";
 
@@ -33,17 +34,18 @@ export class TransactionService {
             // execute a transfer, writing both ledger entries atomically
             const connection: Connection = await getDBConnection();
 
-            const transactionResult = await connection.execute(`INSERT INTO es_transactions (from_iban, to_iban, amount, status) VALUES (:fromIban, :toIban, :amount, :status)`, {
+            const transactionResult = await connection.execute(`INSERT INTO es_transactions (from_iban, to_iban, amount, status) VALUES (:fromIban, :toIban, :amount, :status) RETURNING id INTO :transactionId`, {
                 fromIban,
                 toIban,
                 amount,
-                status: TransactionStatus.PENDING
+                status: TransactionStatus.PENDING,
+                transactionId: { dir: BIND_OUT, type: NUMBER }
             });
 
             // ledger entries
             await connection.execute(`INSERT INTO es_ledger_entries (transaction_id, iban, amount, entry_type, description) VALUES 
             (:transactionId, :iban, :amount, :entryType, :description)`, {
-                transactionId: transactionResult.lastRowid,
+                transactionId: (transactionResult.outBinds as { transactionId: number[] }).transactionId[0],
                 iban: fromIban,
                 amount: -amount,
                 entryType: LedgerEntryType.DEBIT,
@@ -52,7 +54,7 @@ export class TransactionService {
 
             await connection.execute(`INSERT INTO es_ledger_entries (transaction_id, iban, amount, entry_type, description) VALUES 
             (:transactionId, :iban, :amount, :entryType, :description)`, {
-                transactionId: transactionResult.lastRowid,
+                transactionId: (transactionResult.outBinds as { transactionId: number[] }).transactionId[0],
                 iban: toIban,
                 amount: amount,
                 entryType: LedgerEntryType.CREDIT,
@@ -64,7 +66,7 @@ export class TransactionService {
 
             return true;
         } catch (err) {
-            console.error(`Something happened while transferring money from ${fromIban} to ${toIban}: ${err}`);
+            console.error(`Something happened while transferring ${amount} money from ${fromIban} to ${toIban}: ${err}`);
             return false;
         }
     }
@@ -137,6 +139,59 @@ export class TransactionService {
         } catch (err) {
             console.error(`Something happened while trying to retrieve transaction for account ${iban}: ${err}`);
             return [];
+        }
+    }
+
+    async completePendingTransactions(): Promise<void> {
+        const connection = await getDBConnection();
+
+        try {
+            // Alle offenen Ledger Entries auf Accounts anwenden
+            await connection.execute(`
+                UPDATE es_bank_accounts a
+                SET balance = balance + (
+                    SELECT SUM(le.amount)
+                    FROM es_ledger_entries le
+                    JOIN es_transactions t
+                        ON t.id = le.transaction_id
+                    WHERE t.status = :pendingStatus
+                    AND le.iban = a.iban
+                )
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM es_ledger_entries le
+                    JOIN es_transactions t
+                        ON t.id = le.transaction_id
+                    WHERE t.status = :pendingStatus
+                    AND le.iban = a.iban
+                )
+            `, {
+                pendingStatus: TransactionStatus.PENDING
+            });
+
+            // Danach Transaktionen abschließen
+            const result = await connection.execute(`
+                UPDATE es_transactions
+                SET status = :settled,
+                    settled_at = SYSTIMESTAMP
+                WHERE status = :pending
+            `, {
+                settled: TransactionStatus.SETTLED,
+                pending: TransactionStatus.PENDING
+            });
+
+            await connection.commit();
+
+            if (result.rowsAffected) {
+                console.log(`Completed ${result.rowsAffected} pending transactions.`);
+            }
+        
+        } catch (err) {
+            await connection.rollback();
+            console.error(`Error completing pending transactions: ${err}`);
+            throw err;
+        } finally {
+            await connection.close();
         }
     }
 }

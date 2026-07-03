@@ -6,7 +6,7 @@ export class GameConfig {
     /** The base interest rate for the game in percent. */
     private static BASE_INTEREST_RATE = 5;
     /** The base capital for the central bank. */
-    private static BASE_CAPITAL = 1000000;
+    public static BASE_CAPITAL = 1000000;
 
     private static GIRO_RESERVE_RATIO = 0.2;
     private static SAVINGS_RESERVE_RATIO = 0.1;
@@ -15,13 +15,15 @@ export class GameConfig {
         return this.BASE_INTEREST_RATE;
     }
 
-    public static CENTRAL_BANK_ACCOUNT_IBAN = "CENTRALBANK0000000000";
+    public static CENTRAL_BANK_ACCOUNT_IBAN = "CENTRALBANK000000000";
 
     public static async getAvailableLendingCapacity(): Promise<number> {
         try {
             const connection: Connection = await getDBConnection();
 
-            const depositsResult = await connection.execute<{ TOTAL_DEPOSITS: number }>(`SELECT SUM(balance) AS total_deposits FROM es_bank_accounts`);
+            const depositsResult = await connection.execute<{ TOTAL_DEPOSITS: number }>(`SELECT SUM(balance) AS total_deposits FROM es_bank_accounts WHERE account_type != :central_bank_type`, {
+                central_bank_type: AccountType.CENTRAL_BANK
+            });
             const totalDeposits: number = (depositsResult.rows && depositsResult.rows[0]?.TOTAL_DEPOSITS) ?? 0;
 
             const reservesResult = await connection.execute<{ TOTAL_RESERVES: number }>(`

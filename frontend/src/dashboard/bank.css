@@ -1,0 +1,205 @@
+.title-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.title-actions .btn-secondary,
+.title-actions .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bank-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 14px 18px;
+    border: none;
+    background: white;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #7b8091;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.tab-btn:hover {
+    background: #f8f9fc;
+    color: #21232d;
+}
+
+.tab-btn.is-active {
+    color: #355ec9;
+    border-bottom-color: #355ec9;
+    background: #f8fbff;
+}
+
+.tab-panel.hidden {
+    display: none;
+}
+
+.panel-heading {
+    padding: 18px 18px 0;
+}
+
+.panel-heading h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    color: #21232d;
+}
+
+.ledger-list,
+.installment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ledger-entry,
+.installment-entry {
+    border: 1px solid #edf0f5;
+    border-radius: 6px;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 12px;
+    align-items: center;
+}
+
+.ledger-entry strong,
+.installment-entry strong {
+    color: #21232d;
+    font-size: 14px;
+}
+
+.ledger-entry span,
+.installment-entry span {
+    color: #5f6475;
+    font-size: 13px;
+}
+
+.ledger-amount {
+    font-size: 14px;
+    font-weight: 700;
+    text-align: right;
+}
+
+.ledger-amount.credit {
+    color: #367952;
+}
+
+.ledger-amount.debit {
+    color: #c23c43;
+}
+
+.ledger-empty {
+    min-height: 120px;
+}
+
+.credit-score-value {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.credit-score-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.credit-score-badge.excellent {
+    background: #e4f3eb;
+    color: #367952;
+}
+
+.credit-score-badge.good {
+    background: #e4edff;
+    color: #355ec9;
+}
+
+.credit-score-badge.fair {
+    background: #fff2dd;
+    color: #b17a05;
+}
+
+.credit-score-badge.poor {
+    background: #fde8ea;
+    color: #c23c43;
+}
+
+.account-type-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #eef1f8;
+    color: #5f6475;
+}
+
+.pay-installment-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 999px;
+    background: #355ec9;
+    color: white;
+    font-family: "Montserrat", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.pay-installment-btn:hover {
+    background: #2b4fa8;
+}
+
+.pay-installment-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.modal-hint {
+    margin: 12px 0 0;
+    font-size: 13px;
+    color: #c23c43;
+    min-height: 18px;
+}
+
+.modal-hint.success {
+    color: #367952;
+}
+
+.loans-grid {
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .title-actions {
+        width: 100%;
+    }
+
+    .title-actions button {
+        flex: 1;
+        justify-content: center;
+    }
+}
